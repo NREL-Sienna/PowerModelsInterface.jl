@@ -2,3 +2,7 @@ name = "PowerModelsInterface"
 uuid = "7a4b9400-1441-4f08-9626-3f96e0a9a29b"
 authors = ["Jose Daniel Lara <jdlara@berkeley.edu>"]
 version = "0.1.0"
+
+[deps]
+PowerModels = "c36e90e8-916a-50a6-bd94-075b64ef4655"
+PowerSystems = "bcd98974-b02a-5e2f-9ee0-a103f5c450dd"
