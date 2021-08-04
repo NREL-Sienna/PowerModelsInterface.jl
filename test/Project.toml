@@ -1,0 +1,6 @@
+[deps]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+PowerModels = "c36e90e8-916a-50a6-bd94-075b64ef4655"
+PowerSystemCaseBuilder = "f00506e0-b84f-492a-93c2-c0a9afc4364e"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
