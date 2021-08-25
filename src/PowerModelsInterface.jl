@@ -43,9 +43,19 @@ export QCLSPowerModel
 export SDPWRMPowerModel
 export SparseSDPWRMPowerModel
 
-include("pm_data_translator.jl")
-include("pm_wrapper.jl")
-
 const PSY = PowerSystems
+const IS = PSY.IS
+const PM = PowerModels
+
+include("pm_data_translator.jl")
+include("devices/bus.jl")
+include("devices/branch.jl")
+include("devices/shunt.jl")
+include("devices/load.jl")
+include("devices/gen.jl")
+include("devices/storage.jl")
+
+#include("pm_wrapper.jl")
+
 
 end # module
