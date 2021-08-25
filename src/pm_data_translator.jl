@@ -15,20 +15,33 @@ end
 function default_template()
     template = (
         branches = Dict{Symbol, Any}(
-        :ACBranch => (device_model = Any, component_type = PSY.ACBranch),
-        :DCBranch => (device_model = Any, component_type = PSY.DCBranch),
+            :ACBranch => (device_model = Any, component_type = PSY.ACBranch),
+            :DCBranch => (device_model = Any, component_type = PSY.DCBranch),
         ),
         devices = Dict{Symbol, Any}(
             :gens => (device_model = Any, component_type = PSY.ACBranch),
-            ),
+        ),
         transmission = PM.AbstractPowerModel,
     )
     return template
 end
 
-function pass_to_pm(sys::PSY.System, pm_model, initial_time::Dates.DateTime, time_periods::Int, template = default_template())
-    ac_lines, PMmap_ac = get_branches_to_pm(sys, PSY.ACBranch, template.branches, template.network)
-    dc_lines, PMmap_dc = get_branches_to_pm(sys, PSY.DCBranch, template.branches, template.network, length(ac_lines))
+function pass_to_pm(
+    sys::PSY.System,
+    pm_model,
+    initial_time::Dates.DateTime,
+    time_periods::Int,
+    template = default_template(),
+)
+    ac_lines, PMmap_ac =
+        get_branches_to_pm(sys, PSY.ACBranch, template.branches, template.network)
+    dc_lines, PMmap_dc = get_branches_to_pm(
+        sys,
+        PSY.DCBranch,
+        template.branches,
+        template.network,
+        length(ac_lines),
+    )
     pm_buses = get_buses_to_pm(sys, PSY.Bus)
     pm_shunts = get_shunts_to_pm(sys, PSY.FixedAdmittance, template.devices)
     pm_gens = get_gens_to_pm(sys, PSY.Generator, template.devices, Any)

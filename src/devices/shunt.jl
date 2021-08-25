@@ -14,7 +14,7 @@ function get_device_to_pm(
     return PM_shunt
 end
 
-function get_shunts_to_pm(sys::PSY.system, ::Type{T}) where T <: PSY.FixedAdmittance
+function get_shunts_to_pm(sys::PSY.system, ::Type{T}) where {T <: PSY.FixedAdmittance}
     shunts = PSY.get_components(T, sys)
     PM_shunts = Dict{String, Any}()
 

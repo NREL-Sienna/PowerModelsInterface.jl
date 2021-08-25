@@ -1,16 +1,16 @@
 
-function add_pm_cost!(PM_gen::Dict{String, Any}, op_cost::T) where T <: PSY.ThreePartCost
+function add_pm_cost!(PM_gen::Dict{String, Any}, op_cost::T) where {T <: PSY.ThreePartCost}
     #TODO figure out how to convert PSY cost into PM cost
     PM_gen["shutdown"] = PSY.get_start_up(op_cost)
-    PM_gen["startup"]  = PSY.get_shut_down(op_cost)
+    PM_gen["startup"] = PSY.get_shut_down(op_cost)
     add_pm_var_cost!(PM_gen, PSY.get_variable(op_cost))
     return PM_gen
 end
 
-function add_pm_cost!(PM_gen::Dict{String, Any}, op_cost::T) where T <: PSY.TwoPartCost
+function add_pm_cost!(PM_gen::Dict{String, Any}, op_cost::T) where {T <: PSY.TwoPartCost}
     #TODO figure out how to convert PSY cost into PM cost
     PM_gen["shutdown"] = 0.0
-    PM_gen["startup"]  = 0.0
+    PM_gen["startup"] = 0.0
     add_pm_var_cost!(PM_gen, PSY.get_variable(op_cost))
     return PM_gen
 end
@@ -24,7 +24,10 @@ function add_pm_var_cost!(PM_gen::Dict{String, Any}, var_cost::VariableCost{Tupl
 end
 
 # pwl cost
-function add_pm_var_cost!(PM_gen::Dict{String, Any}, var_cost::VariableCost{Vector{Tuple{Float64, Float64}}})
+function add_pm_var_cost!(
+    PM_gen::Dict{String, Any},
+    var_cost::VariableCost{Vector{Tuple{Float64, Float64}}},
+)
     PM_gen["model"] = 1
     PM_gen["ncost"] = length(var_cost)
     PM_gen["cost"] = Vector{Float64}()
@@ -35,7 +38,7 @@ function add_pm_var_cost!(PM_gen::Dict{String, Any}, var_cost::VariableCost{Vect
     return PM_gen
 end
 
-function pm_gen_core(gen::T) where T <: PSY.Generator
+function pm_gen_core(gen::T) where {T <: PSY.Generator}
     PM_gen = Dict{String, Any}(
         "index" => ix,
         "name" => PSY.get_name(gen),
@@ -61,14 +64,16 @@ function get_device_to_pm(
 ) where {D <: Any, T <: PSY.ThermalGen}
     PM_gen = pm_gen_core(gen)
     ramp = PSY.get_ramp_limits(gen).up
-    merge!(PM_gen, Dict{String, Any}(
-        "pmin" => PSY.get_active_power_limits(gen).min,
-        "fuel" => string(PSY.get_fuel(gen)),
-        "ramp_q" => ramp,
-        "ramp_agc" => ramp,
-        "ramp_10" => ramp,
-        "ramp_30" => ramp,
-    )
+    merge!(
+        PM_gen,
+        Dict{String, Any}(
+            "pmin" => PSY.get_active_power_limits(gen).min,
+            "fuel" => string(PSY.get_fuel(gen)),
+            "ramp_q" => ramp,
+            "ramp_agc" => ramp,
+            "ramp_10" => ramp,
+            "ramp_30" => ramp,
+        ),
     )
     add_pm_cost!(PM_gen, PSY.get_operational_cost(gen))
     return PM_gen
@@ -80,10 +85,7 @@ function get_device_to_pm(
     device_formulation::Type{D},
 ) where {D <: Any, T <: PSY.RenewableGen}
     PM_gen = pm_gen_core(gen)
-    merge!(PM_gen, Dict{String, Any}(
-        "pmin" => 0.0,
-    )
-    )
+    merge!(PM_gen, Dict{String, Any}("pmin" => 0.0))
     add_pm_cost!(PM_gen, PSY.get_operational_cost(gen))
     return PM_gen
 end
@@ -95,13 +97,15 @@ function get_device_to_pm(
 ) where {D <: Any, T <: PSY.HydroGen}
     PM_gen = pm_gen_core(gen)
     ramp = PSY.get_ramp_limits(gen).up
-    merge!(PM_gen, Dict{String, Any}(
-        "pmin" => PSY.get_active_power_limits(gen).min,
-        "ramp_q" => ramp,
-        "ramp_agc" => ramp,
-        "ramp_10" => ramp,
-        "ramp_30" => ramp,
-    )
+    merge!(
+        PM_gen,
+        Dict{String, Any}(
+            "pmin" => PSY.get_active_power_limits(gen).min,
+            "ramp_q" => ramp,
+            "ramp_agc" => ramp,
+            "ramp_10" => ramp,
+            "ramp_30" => ramp,
+        ),
     )
     add_pm_cost!(PM_gen, PSY.get_operational_cost(gen))
     return PM_gen
@@ -119,8 +123,7 @@ function get_gens_to_pm(
     for (d, device_model) in gen_template
         !(device_model.component_type <: gen_type) && continue
         start_idx += length(PM_gens)
-        for (i, gen) in
-            enumerate(get_components(device_model.component_type, sys))
+        for (i, gen) in enumerate(get_components(device_model.component_type, sys))
             ix = i + start_idx
             PM_gens["$(ix)"] = get_device_to_pm(ix, gen, device_model.formulation)
         end
