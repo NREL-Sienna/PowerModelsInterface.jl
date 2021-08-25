@@ -16,7 +16,7 @@ function add_pm_cost!(PM_gen::Dict{String, Any}, op_cost::T) where {T <: PSY.Two
 end
 
 # polynomial cost
-function add_pm_var_cost!(PM_gen::Dict{String, Any}, var_cost::VariableCost{Tuple})
+function add_pm_var_cost!(PM_gen::Dict{String, Any}, var_cost::PSY.VariableCost{Tuple})
     PM_gen["model"] = 2
     PM_gen["ncost"] = length(var_cost)
     PM_gen["cost"] = [c for c in reverse(PSY.get_cost(var_cost))]
@@ -26,7 +26,7 @@ end
 # pwl cost
 function add_pm_var_cost!(
     PM_gen::Dict{String, Any},
-    var_cost::VariableCost{Vector{Tuple{Float64, Float64}}},
+    var_cost::PSY.VariableCost{Vector{Tuple{Float64, Float64}}},
 )
     PM_gen["model"] = 1
     PM_gen["ncost"] = length(var_cost)

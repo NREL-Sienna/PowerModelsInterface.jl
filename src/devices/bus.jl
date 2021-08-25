@@ -34,13 +34,23 @@ end
 function get_buses_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
     buses = PSY.get_components(PSY.Bus, sys)
     PM_buses = Dict{String, Any}()
-    PMmap_buses = Dict{Int, PSY.Bus}()
 
     for (ix, bus) in enumerate(buses)
+        number = PSY.get_number(bus)
         PM_buses["$(number)"] = get_device_to_pm(ix, bus, Any)
+    end
+    return PM_buses
+end
+
+function get_pm_map_buses(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
+    buses = PSY.get_components(PSY.Bus, sys)
+    PMmap_buses = Dict{Int, PSY.Bus}()
+
+    for bus in buses
+        number = PSY.get_number(bus)
         if PSY.get_bustype(bus) != PSY.BusTypes.ISOLATED::PSY.BusTypes
             PMmap_buses[number] = bus
         end
     end
-    return PM_buses, PMmap_buses
+    return PMmap_buses
 end

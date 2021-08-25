@@ -28,7 +28,7 @@ function get_device_to_pm(
     return PM_storage
 end
 
-function get_storages_to_pm(sys::PSY.system, ::Type{T}) where {T <: PSY.Storage}
+function get_storages_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Storage}
     storages = PSY.get_components(T, sys)
     PM_storages = Dict{String, Any}()
 

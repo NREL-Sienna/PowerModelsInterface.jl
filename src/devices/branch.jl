@@ -268,6 +268,24 @@ function get_branches_to_pm(
     start_idx = 0,
 ) where {T <: PSY.Branch, S <: PM.AbstractPowerModel}
     PM_branches = Dict{String, Any}()
+
+    for (d, device_model) in branch_template
+        !(device_model.component_type <: branch_type) && continue
+        start_idx += length(PM_branches)
+        for (i, branch) in enumerate(PSY.get_components(device_model.component_type, sys))
+            ix = i + start_idx
+            PM_branches["$(ix)"] = get_device_to_pm(ix, branch, device_model.formulation)
+        end
+    end
+    return PM_branches
+end
+
+function get_pm_map_branches(
+    sys::PSY.System,
+    branch_type::Type{T},
+    branch_template::Dict{Symbol, Any},
+    start_idx = 0,
+) where {T <: PSY.Branch, S <: PM.AbstractPowerModel}
     PMmap_br = Dict{
         NamedTuple{(:from_to, :to_from), Tuple{Tuple{Int, Int, Int}, Tuple{Int, Int, Int}}},
         t where t <: T,
@@ -275,19 +293,17 @@ function get_branches_to_pm(
 
     for (d, device_model) in branch_template
         !(device_model.component_type <: branch_type) && continue
-        start_idx += length(PM_branches)
-        for (i, branch) in
-            enumerate(get_available_components(device_model.component_type, sys))
+        start_idx += length(PMmap_br)
+        branches = PSY.get_components(device_model.component_type, sys)
+        for (i, branch) in enumerate(branches)
             ix = i + start_idx
-            PM_branches["$(ix)"] = get_device_to_pm(ix, branch, device_model.formulation)
-            if PM_branches["$(ix)"]["br_status"] == true
-                f = PM_branches["$(ix)"]["f_bus"]
-                t = PM_branches["$(ix)"]["t_bus"]
-                PMmap_br[(from_to = (ix, f, t), to_from = (ix, t, f))] = branch
-            end
+            arc = PSY.get_arc(branch)
+            f = PSY.get_number(PSY.get_from(arc))
+            t = PSY.get_number(PSY.get_to(arc))
+            PMmap_br[(from_to = (ix, f, t), to_from = (ix, t, f))] = branch
         end
     end
-    return PM_branches, PMmap_br
+    return PMmap_br
 end
 
 # TODO: move this to PSI

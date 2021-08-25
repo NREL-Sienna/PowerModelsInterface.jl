@@ -3,7 +3,14 @@ module PowerModelsInterface
 import PowerSystems
 import PowerModels
 import Dates
+import Pkg
 
+# PMI exports
+export get_pm_data
+export apply_time_series!
+export apply_time_period!
+
+# PowerModels exports
 export run_opf
 export run_pf
 export compute_ac_pf
@@ -14,7 +21,6 @@ export run_dc_pf
 export run_model
 export instantiate_model
 
-# PowerModels exports
 # exact non-convex models
 export ACPPowerModel
 export ACRPowerModel

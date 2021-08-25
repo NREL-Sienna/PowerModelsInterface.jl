@@ -14,12 +14,12 @@ function get_device_to_pm(
     return PM_load
 end
 
-function get_loads_to_pm(sys::PSY.system, ::Type{T}) where {T <: PSY.StaticLoad}
+function get_loads_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.StaticLoad}
     loads = PSY.get_components(T, sys)
     PM_loads = Dict{String, Any}()
 
     for (ix, load) in enumerate(loads)
         PM_loads["$(ix)"] = get_device_to_pm(ix, load, Any)
     end
-    return PM_shunts
+    return PM_loads
 end
