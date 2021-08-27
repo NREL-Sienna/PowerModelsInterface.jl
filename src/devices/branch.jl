@@ -285,7 +285,7 @@ function get_pm_map_branches(
     branch_type::Type{T},
     branch_template::Dict{Symbol, Any},
     start_idx = 0,
-) where {T <: PSY.Branch, S <: PM.AbstractPowerModel}
+) where {T <: PSY.Branch}
     PMmap_br = Dict{
         NamedTuple{(:from_to, :to_from), Tuple{Tuple{Int, Int, Int}, Tuple{Int, Int, Int}}},
         t where t <: T,

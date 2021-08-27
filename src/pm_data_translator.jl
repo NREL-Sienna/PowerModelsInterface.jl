@@ -26,7 +26,7 @@ function default_template()
             :DCBranch => (formulation = Any, component_type = PSY.DCBranch),
         ),
         devices = Dict{Symbol, Any}(
-            :gens => (formulation = Any, component_type = PSY.ACBranch),
+            :gens => (formulation = Any, component_type = PSY.Generator),
         ),
         network = PM.AbstractPowerModel,
     )
@@ -61,7 +61,7 @@ function get_pm_data(sys::PSY.System, template = default_template(), name::Strin
         "switch" => Dict{String, Any}(), #not present in PSY
         "shunt" => pm_shunts,
         "load" => pm_loads,
-        "areas" => Dict{String, Any}(), # TODO
+        #"areas" => Dict{String, Any}(), # TODO: add if present in System
         "name" => name, # TODO: add name arg to function
         "source_type" => "PowerSystems.jl",
         "source_version" => PSY.DATA_FORMAT_VERSION,

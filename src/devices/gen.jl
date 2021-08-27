@@ -16,7 +16,10 @@ function add_pm_cost!(PM_gen::Dict{String, Any}, op_cost::T) where {T <: PSY.Two
 end
 
 # polynomial cost
-function add_pm_var_cost!(PM_gen::Dict{String, Any}, var_cost::PSY.VariableCost{Tuple})
+function add_pm_var_cost!(
+    PM_gen::Dict{String, Any},
+    var_cost::PSY.VariableCost{Tuple{Float64, Float64}},
+)
     PM_gen["model"] = 2
     PM_gen["ncost"] = length(var_cost)
     PM_gen["cost"] = [c for c in reverse(PSY.get_cost(var_cost))]
@@ -38,7 +41,7 @@ function add_pm_var_cost!(
     return PM_gen
 end
 
-function pm_gen_core(gen::T) where {T <: PSY.Generator}
+function pm_gen_core(gen::T, ix::Int) where {T <: PSY.Generator}
     PM_gen = Dict{String, Any}(
         "index" => ix,
         "name" => PSY.get_name(gen),
@@ -59,10 +62,10 @@ end
 
 function get_device_to_pm(
     ix::Int,
-    gen::Type{T},
+    gen::T,
     device_formulation::Type{D},
 ) where {D <: Any, T <: PSY.ThermalGen}
-    PM_gen = pm_gen_core(gen)
+    PM_gen = pm_gen_core(gen, ix)
     ramp = PSY.get_ramp_limits(gen).up
     merge!(
         PM_gen,
@@ -75,27 +78,27 @@ function get_device_to_pm(
             "ramp_30" => ramp,
         ),
     )
-    add_pm_cost!(PM_gen, PSY.get_operational_cost(gen))
+    add_pm_cost!(PM_gen, PSY.get_operation_cost(gen))
     return PM_gen
 end
 
 function get_device_to_pm(
     ix::Int,
-    gen::Type{T},
+    gen::T,
     device_formulation::Type{D},
 ) where {D <: Any, T <: PSY.RenewableGen}
-    PM_gen = pm_gen_core(gen)
+    PM_gen = pm_gen_core(gen, ix)
     merge!(PM_gen, Dict{String, Any}("pmin" => 0.0))
-    add_pm_cost!(PM_gen, PSY.get_operational_cost(gen))
+    add_pm_cost!(PM_gen, PSY.get_operation_cost(gen))
     return PM_gen
 end
 
 function get_device_to_pm(
     ix::Int,
-    gen::Type{T},
+    gen::T,
     device_formulation::Type{D},
 ) where {D <: Any, T <: PSY.HydroGen}
-    PM_gen = pm_gen_core(gen)
+    PM_gen = pm_gen_core(gen, ix)
     ramp = PSY.get_ramp_limits(gen).up
     merge!(
         PM_gen,
@@ -107,7 +110,7 @@ function get_device_to_pm(
             "ramp_30" => ramp,
         ),
     )
-    add_pm_cost!(PM_gen, PSY.get_operational_cost(gen))
+    add_pm_cost!(PM_gen, PSY.get_operation_cost(gen))
     return PM_gen
 end
 
@@ -123,7 +126,7 @@ function get_gens_to_pm(
     for (d, device_model) in gen_template
         !(device_model.component_type <: gen_type) && continue
         start_idx += length(PM_gens)
-        for (i, gen) in enumerate(get_components(device_model.component_type, sys))
+        for (i, gen) in enumerate(PSY.get_components(device_model.component_type, sys))
             ix = i + start_idx
             PM_gens["$(ix)"] = get_device_to_pm(ix, gen, device_model.formulation)
         end
