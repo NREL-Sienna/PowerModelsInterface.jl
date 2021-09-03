@@ -3,6 +3,7 @@ function get_device_to_pm(
     storage::S,
     device_formulation::Type{D},
 ) where {D <: Any, S <: PSY.Storage}
+    qlims = PSY.get_reactive_power_limits(storage)
     PM_storage = Dict{String, Any}(
         "x" => 0.0,
         "r" => 0.0,
@@ -20,20 +21,10 @@ function get_device_to_pm(
         "name" => PSY.get_name(storage),
         "charge_efficiency" => PSY.get_efficiency(storage).in,
         "index" => ix,
-        "qmax" => PSY.get_max_reactive_power(storage),
-        "qmin" => PSY.get_reactive_power_limits(storage).min,
+        "qmax" => isnothing(qlims) ? 0.0 : qlims.max,
+        "qmin" => isnothing(qlims) ? 0.0 : qlims.min,
         "charge_rating" => PSY.get_input_active_power_limits(storage).max,
         "discharge_efficiency" => PSY.get_efficiency(storage).out,
     )
     return PM_storage
-end
-
-function get_storages_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Storage}
-    storages = PSY.get_components(T, sys)
-    PM_storages = Dict{String, Any}()
-
-    for (ix, storage) in enumerate(storages)
-        PM_storages["$(ix)"] = get_device_to_pm(ix, storage, Any)
-    end
-    return PM_storages
 end

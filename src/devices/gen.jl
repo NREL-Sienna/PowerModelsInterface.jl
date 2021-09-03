@@ -34,10 +34,18 @@ function add_pm_var_cost!(
     PM_gen["model"] = 1
     PM_gen["ncost"] = length(var_cost)
     PM_gen["cost"] = Vector{Float64}()
-    for c in var_cost
+    for c in PSY.get_cost(var_cost)
         push!(PM_gen["cost"], last(c))
         push!(PM_gen["cost"], first(c))
     end
+    return PM_gen
+end
+
+# scalar cost
+function add_pm_var_cost!(PM_gen::Dict{String, Any}, var_cost::PSY.VariableCost{Float64})
+    PM_gen["model"] = 2
+    PM_gen["ncost"] = length(var_cost)
+    PM_gen["cost"] = [PSY.get_cost(var_cost)]
     return PM_gen
 end
 
@@ -54,7 +62,6 @@ function pm_gen_core(gen::T, ix::Int) where {T <: PSY.Generator}
         "vg" => PSY.get_magnitude(PSY.get_bus(gen)),
         "pmax" => PSY.get_max_active_power(gen),
         "qmax" => PSY.get_max_reactive_power(gen),
-        "qmin" => PSY.get_reactive_power_limits(gen).min,
         "type" => string(PSY.get_prime_mover(gen)),
     )
     return PM_gen
@@ -76,6 +83,7 @@ function get_device_to_pm(
             "ramp_agc" => ramp,
             "ramp_10" => ramp,
             "ramp_30" => ramp,
+            "qmin" => PSY.get_reactive_power_limits(gen).min,
         ),
     )
     add_pm_cost!(PM_gen, PSY.get_operation_cost(gen))
@@ -88,8 +96,21 @@ function get_device_to_pm(
     device_formulation::Type{D},
 ) where {D <: Any, T <: PSY.RenewableGen}
     PM_gen = pm_gen_core(gen, ix)
-    merge!(PM_gen, Dict{String, Any}("pmin" => 0.0))
+    merge!(
+        PM_gen,
+        Dict{String, Any}("pmin" => 0.0, "qmin" => PSY.get_reactive_power_limits(gen).min),
+    )
     add_pm_cost!(PM_gen, PSY.get_operation_cost(gen))
+    return PM_gen
+end
+
+function get_device_to_pm(
+    ix::Int,
+    gen::T,
+    device_formulation::Type{D},
+) where {D <: Any, T <: PSY.RenewableFix}
+    PM_gen = pm_gen_core(gen, ix)
+    merge!(PM_gen, Dict{String, Any}("pmin" => 0.0, "qmin" => 0.0))
     return PM_gen
 end
 
@@ -108,28 +129,37 @@ function get_device_to_pm(
             "ramp_agc" => ramp,
             "ramp_10" => ramp,
             "ramp_30" => ramp,
+            "qmin" => PSY.get_reactive_power_limits(gen).min,
         ),
     )
     add_pm_cost!(PM_gen, PSY.get_operation_cost(gen))
     return PM_gen
 end
 
-function get_gens_to_pm(
-    sys::PSY.System,
-    gen_type::Type{T},
-    gen_template::Dict{Symbol, Any},
-    system_formulation::Type{S},
-    start_idx = 0,
-) where {T <: PSY.Generator, S <: PM.AbstractPowerModel}
-    PM_gens = Dict{String, Any}()
+function get_time_series_to_pm!(
+    pm_data::Dict{String, Any},
+    pm_category::String,
+    pm_id::String,
+    device::T,
+    start_time::Dates.DateTime,
+    time_periods::Int,
+) where {T <: PSY.RenewableGen}
+    psy_forecast_name = "max_active_power"
+    pm_field_name = "pmax"
 
-    for (d, device_model) in gen_template
-        !(device_model.component_type <: gen_type) && continue
-        start_idx += length(PM_gens)
-        for (i, gen) in enumerate(PSY.get_components(device_model.component_type, sys))
-            ix = i + start_idx
-            PM_gens["$(ix)"] = get_device_to_pm(ix, gen, device_model.formulation)
-        end
+    ts_data = get_time_series_values(
+        Deterministic,
+        device,
+        psy_forecast_name,
+        start_time = start_time,
+        len = time_periods,
+    )
+    pm_update = Dict{String, Any}("nw" => Dict{String, Any}())
+    for (t, nw) in pm_data["nw"]
+        pm_update["nw"][t] = Dict(
+            pm_category => Dict(pm_id => Dict(pm_field_name => ts_data[parse(Int, t)])),
+        )
     end
-    return PM_gens
+
+    PM.update_data!(pm_data, pm_update)
 end

@@ -81,7 +81,6 @@ const PM = PowerModels
 include("pm_data_translator.jl")
 include("devices/bus.jl")
 include("devices/branch.jl")
-include("devices/shunt.jl")
 include("devices/load.jl")
 include("devices/gen.jl")
 include("devices/storage.jl")

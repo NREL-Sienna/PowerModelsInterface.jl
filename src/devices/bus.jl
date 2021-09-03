@@ -31,7 +31,7 @@ function get_device_to_pm(
     return PM_bus
 end
 
-function get_buses_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
+function get_devices_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
     buses = PSY.get_components(PSY.Bus, sys)
     PM_buses = Dict{String, Any}()
 
@@ -42,15 +42,15 @@ function get_buses_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
     return PM_buses
 end
 
-function get_pm_map_buses(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
+function get_pm_map(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
     buses = PSY.get_components(PSY.Bus, sys)
-    PMmap_buses = Dict{Int, PSY.Bus}()
+    pm_map = Dict{String, PSY.Bus}()
 
     for bus in buses
         number = PSY.get_number(bus)
         if PSY.get_bustype(bus) != PSY.BusTypes.ISOLATED::PSY.BusTypes
-            PMmap_buses[number] = bus
+            pm_map["$number"] = bus
         end
     end
-    return PMmap_buses
+    return pm_map
 end

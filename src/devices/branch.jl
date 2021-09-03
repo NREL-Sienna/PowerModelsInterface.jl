@@ -259,28 +259,8 @@ function get_device_to_pm(
     )
     return PM_branch
 end
-
-function get_branches_to_pm(
-    sys::PSY.System,
-    branch_type::Type{T},
-    branch_template::Dict{Symbol, Any},
-    system_formulation::Type{S},
-    start_idx = 0,
-) where {T <: PSY.Branch, S <: PM.AbstractPowerModel}
-    PM_branches = Dict{String, Any}()
-
-    for (d, device_model) in branch_template
-        !(device_model.component_type <: branch_type) && continue
-        start_idx += length(PM_branches)
-        for (i, branch) in enumerate(PSY.get_components(device_model.component_type, sys))
-            ix = i + start_idx
-            PM_branches["$(ix)"] = get_device_to_pm(ix, branch, device_model.formulation)
-        end
-    end
-    return PM_branches
-end
-
-function get_pm_map_branches(
+#=
+function get_pm_map(
     sys::PSY.System,
     branch_type::Type{T},
     branch_template::Dict{Symbol, Any},
@@ -305,7 +285,7 @@ function get_pm_map_branches(
     end
     return PMmap_br
 end
-
+=#
 # TODO: move this to PSI
 #=
 function get_branches_to_pm(

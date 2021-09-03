@@ -1,21 +1,41 @@
-# allows PSI to keep track of which PM element corresponds to a specific PSY element
-struct PMmap
-    bus::Dict{Int, PSY.Bus}
-    arcs::Dict{
-        NamedTuple{(:from_to, :to_from), Tuple{Tuple{Int, Int, Int}, Tuple{Int, Int, Int}}},
-        t where t <: PSY.ACBranch,
-    }
-    arcs_dc::Dict{
-        NamedTuple{(:from_to, :to_from), Tuple{Tuple{Int, Int, Int}, Tuple{Int, Int, Int}}},
-        t where t <: PSY.DCBranch,
-    }
+
+function get_pm_map(sys::PSY.System, template = default_template())
+    pm_map = Dict{String, Any}()
+    pm_map["branch"] = get_pm_map(sys, PSY.ACBranch, template.branches)
+    pm_map["dcline"] =
+        get_pm_map(sys, PSY.DCBranch, template.branches, length(pm_map["branch"]))
+    pm_map["bus"] = get_pm_map(sys, PSY.Bus)
+    pm_map["shunt"] = get_pm_map(sys, PSY.FixedAdmittance, template.devices)
+    pm_map["load"] = get_pm_map(sys, PSY.StaticLoad, template.devices)
+
+    thermal = get_pm_map(sys, PSY.ThermalGen, template.devices)
+    renewable = get_pm_map(sys, PSY.ThermalGen, template.devices, length(thermal))
+    hydro =
+        get_pm_map(sys, PSY.HydroGen, template.devices, length(thermal) + length(renewable))
+    pm_map["gen"] = merge(thermal, renewable, hydro)
+
+    pm_map["storage"] = get_pm_map(sys, PSY.Storage, template.devices)
+    return pm_map
 end
 
-function PMmap(sys::PSY.System, template = default_template())
-    PMmap_ac = get_pm_map_branches(sys, PSY.ACBranch, template.branches)
-    PMmap_dc = get_pm_map_branches(sys, PSY.DCBranch, template.branches, length(PMmap_ac))
-    PMmap_bus = get_pm_map_buses(sys, PSY.Bus)
-    return PMmap(PMmap_bus, PMmap_ac, PMmap_dc)
+function get_pm_map(
+    sys::PSY.System,
+    component_type::Type{T},
+    devices_template::Dict{Symbol, Any},
+    start_idx::Int = 0,
+) where {T <: PSY.Component}
+    devices = PSY.get_components(component_type, sys)
+
+    PM_devices = Dict{String, component_type}()
+
+    for (d, device_model) in devices_template
+        !(device_model.component_type <: component_type) && continue
+        start_idx += length(PM_devices)
+        for (ix, device) in enumerate(devices)
+            PM_devices["$(ix)"] = device
+        end
+    end
+    return PM_devices
 end
 
 # dummy template to enable default PSY -> PM mapping but allow for more control in PSI
@@ -26,29 +46,54 @@ function default_template()
             :DCBranch => (formulation = Any, component_type = PSY.DCBranch),
         ),
         devices = Dict{Symbol, Any}(
-            :gens => (formulation = Any, component_type = PSY.Generator),
+            :thermal => (formulation = Any, component_type = PSY.ThermalGen),
+            :renewable => (formulation = Any, component_type = PSY.RenewableGen),
+            :load => (formulation = Any, component_type = PSY.StaticLoad),
+            :storage => (formulation = Any, component_type = PSY.Storage),
+            :shunt => (formulation = Any, component_type = PSY.FixedAdmittance),
         ),
         network = PM.AbstractPowerModel,
     )
     return template
 end
 
-function get_pm_data(sys::PSY.System, template = default_template(), name::String = "")
-    ac_lines = get_branches_to_pm(sys, PSY.ACBranch, template.branches, template.network)
+function get_devices_to_pm(
+    sys::PSY.System,
+    device_type::Type{T},
+    devices_template::Dict{Symbol, Any},
+    system_formulation::Type{S},
+    start_idx = 0,
+) where {T <: PSY.Component, S <: PM.AbstractPowerModel}
+    devices = PSY.get_components(T, sys)
+    PM_devices = Dict{String, Any}()
 
-    dc_lines = get_branches_to_pm(
+    for (d, device_model) in devices_template
+        !(device_model.component_type <: device_type) && continue
+        start_idx += length(PM_devices)
+        for (ix, device) in enumerate(devices)
+            PM_devices["$(ix)"] = get_device_to_pm(ix, device, Any)
+        end
+    end
+    return PM_devices
+end
+
+function get_pm_data(sys::PSY.System, template = default_template(), name::String = "")
+    ac_lines = get_devices_to_pm(sys, PSY.ACBranch, template.branches, template.network)
+
+    dc_lines = get_devices_to_pm(
         sys,
         PSY.DCBranch,
         template.branches,
         template.network,
-        length(ac_lines),
+        #length(ac_lines),
     )
 
-    pm_buses = get_buses_to_pm(sys, PSY.Bus)
-    pm_shunts = get_shunts_to_pm(sys, PSY.FixedAdmittance)
-    pm_gens = get_gens_to_pm(sys, PSY.Generator, template.devices, template.network)
-    pm_loads = get_loads_to_pm(sys, PSY.StaticLoad)
-    pm_storages = get_storages_to_pm(sys, PSY.Storage)
+    pm_buses = get_devices_to_pm(sys, PSY.Bus)
+    pm_shunts =
+        get_devices_to_pm(sys, PSY.FixedAdmittance, template.devices, template.network)
+    pm_gens = get_devices_to_pm(sys, PSY.Generator, template.devices, template.network)
+    pm_loads = get_devices_to_pm(sys, PSY.StaticLoad, template.devices, template.network)
+    pm_storages = get_devices_to_pm(sys, PSY.Storage, template.devices, template.network)
 
     pm_data_translation = Dict{String, Any}(
         "bus" => pm_buses,
@@ -70,23 +115,33 @@ function get_pm_data(sys::PSY.System, template = default_template(), name::Strin
     return pm_data_translation
 end
 
-function apply_time_period!(
+function get_time_series_to_pm!(
     pm_data::Dict{String, Any},
-    sys::PSY.System,
-    period::Dates.DateTime,
-)
-    #TODO: function apply time series from forecasts to the replicated network
+    pm_category::String,
+    pm_id::String,
+    device::T,
+    start_time::Dates.DateTime,
+    time_periods::Int,
+) where {T <: PSY.Component}
+    return # do nothing by default
 end
 
-function apply_time_series!(
+function apply_time_series(
     pm_data::Dict{String, Any},
     sys::PSY.System,
-    initial_time::Dates.DateTime,
+    start_time::Dates.DateTime,
     time_periods::Int,
+    template::Any,
 )
-    multi_network = PM.replicate(pm_data, time_periods)
-    for (ix, nw) in multi_network["nw"]
-        period = initial_time + (PSY.get_resolution(sys) * (parse(Int64, ix) - 1))
-        apply_time_period!(nw, sys, period)
+    pm_data = PM._IM.ismultinetwork(pm_data) ? pm_data : PM.replicate(pm_data, time_periods)
+    @assert length(pm_data["nw"]) == time_periods
+
+    pm_map = get_pm_map(sys, template)
+
+    for key in ["load", "gen"] #TODO: add shunt
+        for (id, device) in pm_map[key]
+            get_time_series_to_pm!(pm_data, key, id, device, start_time, time_periods)
+        end
     end
+    return pm_data
 end
