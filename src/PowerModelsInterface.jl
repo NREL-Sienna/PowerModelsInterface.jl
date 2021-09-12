@@ -6,8 +6,8 @@ import Dates
 
 # PMI exports
 export get_pm_data
-export apply_time_series!
-export apply_time_period!
+#export apply_time_series!
+#export apply_time_period!
 
 # PowerModels exports
 import PowerModels: run_opf
@@ -84,6 +84,7 @@ include("devices/branch.jl")
 include("devices/load.jl")
 include("devices/gen.jl")
 include("devices/storage.jl")
+include("devices/areas.jl")
 
 #include("pm_wrapper.jl")
 

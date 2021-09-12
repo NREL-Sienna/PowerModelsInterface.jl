@@ -1,17 +1,23 @@
 
-function add_pm_cost!(PM_gen::Dict{String, Any}, op_cost::T) where {T <: PSY.ThreePartCost}
-    #TODO figure out how to convert PSY cost into PM cost
-    PM_gen["shutdown"] = PSY.get_start_up(op_cost)
-    PM_gen["startup"] = PSY.get_shut_down(op_cost)
-    add_pm_var_cost!(PM_gen, PSY.get_variable(op_cost))
+function add_pm_cost!(
+    PM_gen::Dict{String, Any},
+    op_cost::T,
+    base::Float64,
+) where {T <: PSY.ThreePartCost}
+    PM_gen["startup"] = PSY.get_start_up(op_cost)
+    PM_gen["shutdown"] = PSY.get_shut_down(op_cost)
+    add_pm_var_cost!(PM_gen, PSY.get_variable(op_cost), base, PSY.get_fixed(op_cost))
     return PM_gen
 end
 
-function add_pm_cost!(PM_gen::Dict{String, Any}, op_cost::T) where {T <: PSY.TwoPartCost}
-    #TODO figure out how to convert PSY cost into PM cost
+function add_pm_cost!(
+    PM_gen::Dict{String, Any},
+    op_cost::T,
+    base::Float64,
+) where {T <: PSY.TwoPartCost}
     PM_gen["shutdown"] = 0.0
     PM_gen["startup"] = 0.0
-    add_pm_var_cost!(PM_gen, PSY.get_variable(op_cost))
+    add_pm_var_cost!(PM_gen, PSY.get_variable(op_cost), base, PSY.get_fixed(op_cost))
     return PM_gen
 end
 
@@ -19,10 +25,20 @@ end
 function add_pm_var_cost!(
     PM_gen::Dict{String, Any},
     var_cost::PSY.VariableCost{Tuple{Float64, Float64}},
+    base::Float64,
+    fixed::Float64,
 )
+    cost = PSY.get_cost(var_cost)
     PM_gen["model"] = 2
-    PM_gen["ncost"] = length(var_cost)
-    PM_gen["cost"] = [c for c in reverse(PSY.get_cost(var_cost))]
+    PM_gen["cost"] = Vector{Float64}()
+    PM_gen["ncost"] = cost[1] != 0.0 ? 3 : cost[2] != 0.0 ? 2 : 0
+    PM_gen["ncost"] == 0 && return PM_gen
+
+    for idx in (4 - PM_gen["ncost"]):2
+        push!(PM_gen["cost"], cost[idx])
+        PM_gen["cost"] = PM_gen["cost"] .* base
+    end
+    push!(PM_gen["cost"], fixed)
     return PM_gen
 end
 
@@ -30,22 +46,29 @@ end
 function add_pm_var_cost!(
     PM_gen::Dict{String, Any},
     var_cost::PSY.VariableCost{Vector{Tuple{Float64, Float64}}},
+    base::Float64,
+    fixed::Float64,
 )
     PM_gen["model"] = 1
     PM_gen["ncost"] = length(var_cost)
     PM_gen["cost"] = Vector{Float64}()
     for c in PSY.get_cost(var_cost)
         push!(PM_gen["cost"], last(c))
-        push!(PM_gen["cost"], first(c))
+        push!(PM_gen["cost"], first(c) + fixed)
     end
     return PM_gen
 end
 
 # scalar cost
-function add_pm_var_cost!(PM_gen::Dict{String, Any}, var_cost::PSY.VariableCost{Float64})
+function add_pm_var_cost!(
+    PM_gen::Dict{String, Any},
+    var_cost::PSY.VariableCost{Float64},
+    base::Float64,
+    fixed::Float64,
+)
     PM_gen["model"] = 2
     PM_gen["ncost"] = length(var_cost)
-    PM_gen["cost"] = [PSY.get_cost(var_cost)]
+    PM_gen["cost"] = [PSY.get_cost(var_cost) + fixed]
     return PM_gen
 end
 
@@ -54,9 +77,9 @@ function pm_gen_core(gen::T, ix::Int) where {T <: PSY.Generator}
         "index" => ix,
         "name" => PSY.get_name(gen),
         "gen_bus" => PSY.get_number(PSY.get_bus(gen)),
-        "source_id" => ["gen", ix],
+        "source_id" => split(PSY.get_name(gen), "-"),
         "mbase" => PSY.get_base_power(gen),
-        "gen_status" => PSY.get_available(gen),
+        "gen_status" => Int(PSY.get_available(gen)),
         "pg" => PSY.get_active_power(gen),
         "qg" => PSY.get_reactive_power(gen),
         "vg" => PSY.get_magnitude(PSY.get_bus(gen)),
@@ -86,7 +109,7 @@ function get_device_to_pm(
             "qmin" => PSY.get_reactive_power_limits(gen).min,
         ),
     )
-    add_pm_cost!(PM_gen, PSY.get_operation_cost(gen))
+    add_pm_cost!(PM_gen, PSY.get_operation_cost(gen), gen.internal.units_info.base_value)
     return PM_gen
 end
 

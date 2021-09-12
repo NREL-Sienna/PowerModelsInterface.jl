@@ -9,6 +9,7 @@ import JuMP
 import Ipopt
 import Cbc
 import SCS
+import Memento
 
 # Test Packages
 using Test
@@ -57,6 +58,8 @@ LOG_LEVELS = Dict(
     "Warn" => Logging.Warn,
     "Error" => Logging.Error,
 )
+
+memento_logger = Memento.config!("error")
 
 """
 Copied @includetests from https://github.com/ssfrr/TestSetExtensions.jl.

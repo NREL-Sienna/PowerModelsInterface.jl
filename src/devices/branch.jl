@@ -4,7 +4,10 @@ function get_device_to_pm(
     branch::PSY.PhaseShiftingTransformer,
     device_formulation::Type{D},
 ) where {D <: Any}
+    f_bus = PSY.get_number(PSY.get_arc(branch).from)
+    t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(
+        "source_id" => ["transformer", f_bus, t_bus, 0, PSY.get_name(branch), 0],
         "br_r" => PSY.get_r(branch),
         "rate_a" => PSY.get_rate(branch),
         "shift" => PSY.get_α(branch),
@@ -14,9 +17,9 @@ function get_device_to_pm(
         "g_to" => 0.0,
         "g_fr" => 0.0,
         "b_fr" => PSY.get_primary_shunt(branch) / 2,
-        "f_bus" => PSY.get_number(PSY.get_arc(branch).from),
+        "f_bus" => f_bus,
         "br_status" => Float64(PSY.get_available(branch)),
-        "t_bus" => PSY.get_number(PSY.get_arc(branch).to),
+        "t_bus" => t_bus,
         "b_to" => PSY.get_primary_shunt(branch) / 2,
         "index" => ix,
         "angmin" => -π / 2,
@@ -60,7 +63,10 @@ function get_device_to_pm(
     branch::PSY.Transformer2W,
     device_formulation::Type{D},
 ) where {D <: Any}
+    f_bus = PSY.get_number(PSY.get_arc(branch).from)
+    t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(
+        "source_id" => ["transformer", f_bus, t_bus, 0, PSY.get_name(branch), 0],
         "br_r" => PSY.get_r(branch),
         "rate_a" => PSY.get_rate(branch),
         "shift" => 0.0,
@@ -70,9 +76,9 @@ function get_device_to_pm(
         "g_to" => 0.0,
         "g_fr" => 0.0,
         "b_fr" => PSY.get_primary_shunt(branch) / 2,
-        "f_bus" => PSY.get_number(PSY.get_arc(branch).from),
+        "f_bus" => f_bus,
         "br_status" => Float64(PSY.get_available(branch)),
-        "t_bus" => PSY.get_number(PSY.get_arc(branch).to),
+        "t_bus" => t_bus,
         "b_to" => PSY.get_primary_shunt(branch) / 2,
         "index" => ix,
         "angmin" => -π / 2,
@@ -116,7 +122,10 @@ function get_device_to_pm(
     branch::PSY.TapTransformer,
     device_formulation::Type{D},
 ) where {D <: Any}
+    f_bus = PSY.get_number(PSY.get_arc(branch).from)
+    t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(
+        "source_id" => ["transformer", f_bus, t_bus, 0, PSY.get_name(branch), 0],
         "br_r" => PSY.get_r(branch),
         "rate_a" => PSY.get_rate(branch),
         "shift" => 0.0,
@@ -126,9 +135,9 @@ function get_device_to_pm(
         "g_to" => 0.0,
         "g_fr" => 0.0,
         "b_fr" => PSY.get_primary_shunt(branch) / 2,
-        "f_bus" => PSY.get_number(PSY.get_arc(branch).from),
+        "f_bus" => f_bus,
         "br_status" => Float64(PSY.get_available(branch)),
-        "t_bus" => PSY.get_number(PSY.get_arc(branch).to),
+        "t_bus" => t_bus,
         "b_to" => PSY.get_primary_shunt(branch) / 2,
         "index" => ix,
         "angmin" => -π / 2,
@@ -172,7 +181,10 @@ function get_device_to_pm(
     branch::PSY.ACBranch,
     device_formulation::Type{D},
 ) where {D <: Any}
+    f_bus = PSY.get_number(PSY.get_arc(branch).from)
+    t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(
+        "source_id" => ["branch", f_bus, t_bus, PSY.get_name(branch)],
         "br_r" => PSY.get_r(branch),
         "rate_a" => PSY.get_rate(branch),
         "shift" => 0.0,
@@ -182,9 +194,9 @@ function get_device_to_pm(
         "g_to" => 0.0,
         "g_fr" => 0.0,
         "b_fr" => PSY.get_b(branch).from,
-        "f_bus" => PSY.get_number(PSY.get_arc(branch).from),
+        "f_bus" => f_bus,
         "br_status" => Float64(PSY.get_available(branch)),
-        "t_bus" => PSY.get_number(PSY.get_arc(branch).to),
+        "t_bus" => t_bus,
         "b_to" => PSY.get_b(branch).to,
         "index" => ix,
         "angmin" => PSY.get_angle_limits(branch).min,
@@ -228,7 +240,10 @@ function get_device_to_pm(
     branch::PSY.HVDCLine,
     device_formulation::Type{D},
 ) where {D <: Any}
+    f_bus = PSY.get_number(PSY.get_arc(branch).from)
+    t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(
+        "source_id" => ["branch", f_bus, t_bus, PSY.get_name(branch)],
         "loss1" => PSY.get_loss(branch).l1,
         "mp_pmax" => PSY.get_reactive_power_limits_from(branch).max,
         "model" => 2,
@@ -241,10 +256,10 @@ function get_device_to_pm(
         "vt" => PSY.get_magnitude(PSY.get_arc(branch).to),
         "qmaxf" => PSY.get_reactive_power_limits_from(branch).max,
         "pmint" => PSY.get_active_power_limits_to(branch).min,
-        "f_bus" => PSY.get_number(PSY.get_arc(branch).from),
+        "f_bus" => f_bus,
         "mp_pmin" => PSY.get_reactive_power_limits_from(branch).min,
         "br_status" => Float64(PSY.get_available(branch)),
-        "t_bus" => PSY.get_number(PSY.get_arc(branch).to),
+        "t_bus" => t_bus,
         "index" => ix,
         "qmint" => PSY.get_reactive_power_limits_to(branch).min,
         "qf" => 0.0,

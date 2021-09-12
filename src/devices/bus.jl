@@ -13,7 +13,7 @@ function get_device_to_pm(
 ) where {D <: Any, B <: PSY.Bus}
     number = PSY.get_number(bus)
     PM_bus = Dict{String, Any}(
-        "zone" => 1,
+        "zone" => 1, #TODO: fill this with real data
         "bus_i" => PSY.get_number(bus),
         "bus_type" => pm_bustypes[PSY.get_bustype(bus)],
         "vmax" => PSY.get_voltage_limits(bus).max,

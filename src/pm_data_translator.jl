@@ -78,6 +78,8 @@ function get_devices_to_pm(
 end
 
 function get_pm_data(sys::PSY.System, template = default_template(), name::String = "")
+    PSY.set_units_base_system!(sys, "SYSTEM_BASE")
+
     ac_lines = get_devices_to_pm(sys, PSY.ACBranch, template.branches, template.network)
 
     dc_lines = get_devices_to_pm(
@@ -94,6 +96,7 @@ function get_pm_data(sys::PSY.System, template = default_template(), name::Strin
     pm_gens = get_devices_to_pm(sys, PSY.Generator, template.devices, template.network)
     pm_loads = get_devices_to_pm(sys, PSY.StaticLoad, template.devices, template.network)
     pm_storages = get_devices_to_pm(sys, PSY.Storage, template.devices, template.network)
+    pm_areas = get_devices_to_pm(sys, PSY.Area)
 
     pm_data_translation = Dict{String, Any}(
         "bus" => pm_buses,
@@ -106,7 +109,7 @@ function get_pm_data(sys::PSY.System, template = default_template(), name::Strin
         "switch" => Dict{String, Any}(), #not present in PSY
         "shunt" => pm_shunts,
         "load" => pm_loads,
-        #"areas" => Dict{String, Any}(), # TODO: add if present in System
+        "areas" => pm_areas,
         "name" => name, # TODO: add name arg to function
         "source_type" => "PowerSystems.jl",
         "source_version" => PSY.DATA_FORMAT_VERSION,
