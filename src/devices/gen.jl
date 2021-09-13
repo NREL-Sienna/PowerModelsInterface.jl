@@ -166,22 +166,58 @@ function get_time_series_to_pm!(
     pm_id::String,
     device::T,
     start_time::Dates.DateTime,
-    time_periods::Int,
+    time_periods::UnitRange{Int},
 ) where {T <: PSY.RenewableGen}
     psy_forecast_name = "max_active_power" # change this line for different forecasts
     pm_field_name = "pmax"# change this line to apply forecast to different fields
 
-    ts_data = get_time_series_values(
-        Deterministic,
+    ts_data = PSY.get_time_series_values(
+        PSY.Deterministic,
         device,
         psy_forecast_name,
         start_time = start_time,
-        len = time_periods,
+        len = last(time_periods),
     )
-    pm_update = Dict{String, Any}("nw" => Dict{String, Any}())
-    for (t, nw) in pm_data["nw"]
-        pm_update["nw"][t] = Dict(
-            pm_category => Dict(pm_id => Dict(pm_field_name => ts_data[parse(Int, t)])),
+    if haskey(pm_data, "nw")
+        pm_update = Dict{String, Any}("nw" => Dict{String, Any}())
+        for (t, nw) in pm_data["nw"]
+            pm_update["nw"][t] = Dict(
+                pm_category => Dict(
+                    pm_id =>
+                        Dict(pm_field_name => ts_data[time_periods[parse(Int, t)]]),
+                ),
+            )
+        end
+    else
+        throw(@error "cannot apply time series to single period data")
+    end
+
+    PM.update_data!(pm_data, pm_update)
+end
+
+function get_time_series_to_pm!(
+    pm_data::Dict{String, Any},
+    pm_category::String,
+    pm_id::String,
+    device::T,
+    start_time::Dates.DateTime,
+    time_period::Int,
+) where {T <: PSY.RenewableGen}
+    psy_forecast_name = "max_active_power" # change this line for different forecasts
+    pm_field_name = "pmax"# change this line to apply forecast to different fields
+
+    ts_data = PSY.get_time_series_values(
+        PSY.Deterministic,
+        device,
+        psy_forecast_name,
+        start_time = start_time,
+        len = time_period,
+    )
+    if haskey(pm_data, "nw")
+        throw(@error "cannot apply single time period data to multi-network")
+    else
+        pm_update = Dict{String, Any}(
+            pm_category => Dict(pm_id => Dict(pm_field_name => ts_data[time_period])),
         )
     end
 

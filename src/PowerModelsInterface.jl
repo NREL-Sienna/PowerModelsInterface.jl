@@ -6,22 +6,24 @@ import Dates
 
 # PMI exports
 export get_pm_data
-#export apply_time_series
-#export apply_time_period!
+export apply_time_series
 
 # PowerModels exports
 import PowerModels: run_opf
 export run_opf
+import PowerModels: run_mn_opf
+export run_mn_opf
 import PowerModels: run_pf
 export run_pf
-import PowerModels: compute_ac_pf
-export compute_ac_pf
+
 import PowerModels: run_ac_pf
 export run_ac_pf
-import PowerModels: compute_dc_pf
-export compute_dc_pf
 import PowerModels: run_dc_pf
 export run_dc_pf
+import PowerModels: compute_ac_pf
+export compute_ac_pf
+import PowerModels: compute_dc_pf
+export compute_dc_pf
 
 import PowerModels: run_model
 export run_model
@@ -85,7 +87,6 @@ include("devices/load.jl")
 include("devices/gen.jl")
 include("devices/storage.jl")
 include("devices/areas.jl")
-
-#include("pm_wrapper.jl")
+include("pm_wrapper.jl")
 
 end # module

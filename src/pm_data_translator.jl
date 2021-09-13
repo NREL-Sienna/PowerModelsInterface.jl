@@ -77,7 +77,24 @@ function get_devices_to_pm(
     return PM_devices
 end
 
-function get_pm_data(sys::PSY.System, template = default_template(), name::String = "")
+const ACCEPTED_PM_DATA_KWARGS = [:name, :initial_time, :time_periods, :period]
+
+"""
+Creates a PowerModels data dictionary from a PowerSystems `System`. To populate time series
+data in the resulting dataset, pass `initial_time` kwarg along with either `period` for a
+single time period, or `time_periods` to create a multi-network dataset with multiple time periods
+
+# Arguments
+- `sys::System`: PowerSystems System
+- `template::Any=default_template()`: Template to control data conversion
+
+# Key word arguments
+- `name::String`: system name
+- `initial_time::DateTime`: `System` forecast initial time
+- `time_periods::UnitRange{Int}=1:PSY.get_forecast_horizon(sys)`: indices for selecting forecast periods. Valid extent is `1:horizon`
+- `period::Int=1`: index for selecting forecast period. Valid options
+"""
+function get_pm_data(sys::PSY.System, template = default_template(); kwargs...)
     PSY.set_units_base_system!(sys, "SYSTEM_BASE")
 
     ac_lines = get_devices_to_pm(sys, PSY.ACBranch, template.branches, template.network)
@@ -110,10 +127,28 @@ function get_pm_data(sys::PSY.System, template = default_template(), name::Strin
         "shunt" => pm_shunts,
         "load" => pm_loads,
         "areas" => pm_areas,
-        "name" => name, # TODO: add name arg to function
+        "name" => get(kwargs, :name, ""), # TODO: add name arg to function
         "source_type" => "PowerSystems.jl",
         "source_version" => PSY.DATA_FORMAT_VERSION,
     )
+
+    initial_time = get(kwargs, :initial_time, nothing)
+    if !isnothing(initial_time)
+        if haskey(kwargs, :time_periods)
+            time_periods = get(kwargs, :time_periods, 1:PSY.get_forecast_horizon(sys))
+            @info "applying the $time_periods periods from the $initial_time forecast"
+            pm_data_translation = apply_time_series(
+                pm_data_translation,
+                sys,
+                kwargs[:initial_time],
+                time_periods,
+            )
+        else
+            period = get(kwargs, :period, 1)
+            @info "applying the $period period from the $initial_time forecast"
+            apply_time_period!(pm_data_translation, sys, kwargs[:initial_time], period)
+        end
+    end
 
     return pm_data_translation
 end
@@ -124,7 +159,7 @@ function get_time_series_to_pm!(
     pm_id::String,
     device::T,
     start_time::Dates.DateTime,
-    time_periods::Int,
+    time_periods::Union{UnitRange{Int}, Int},
 ) where {T <: PSY.Component}
     return # do nothing by default
 end
@@ -133,17 +168,36 @@ function apply_time_series(
     pm_data::Dict{String, Any},
     sys::PSY.System,
     start_time::Dates.DateTime,
-    time_periods::Int,
+    time_periods::UnitRange{Int},
     template::Any = default_template(),
 )
-    pm_data = PM._IM.ismultinetwork(pm_data) ? pm_data : PM.replicate(pm_data, time_periods)
-    @assert length(pm_data["nw"]) == time_periods
+    pm_data =
+        PM._IM.ismultinetwork(pm_data) ? pm_data :
+        PM.replicate(pm_data, length(time_periods))
+    @assert length(pm_data["nw"]) == length(time_periods)
 
     pm_map = get_pm_map(sys, template)
 
     for key in ["load", "gen"] #TODO: add shunt
         for (id, device) in pm_map[key]
             get_time_series_to_pm!(pm_data, key, id, device, start_time, time_periods)
+        end
+    end
+    return pm_data
+end
+
+function apply_time_period!(
+    pm_data::Dict{String, Any},
+    sys::PSY.System,
+    start_time::Dates.DateTime,
+    time_period::Int,
+    template::Any = default_template(),
+)
+    pm_map = get_pm_map(sys, template)
+
+    for key in ["load", "gen"] #TODO: add shunt
+        for (id, device) in pm_map[key]
+            get_time_series_to_pm!(pm_data, key, id, device, start_time, time_period)
         end
     end
     return pm_data
