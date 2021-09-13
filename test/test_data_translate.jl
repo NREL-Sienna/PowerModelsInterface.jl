@@ -3,16 +3,9 @@
 # test PMmap
 # test time series data insertion
 
-GEN_EQ_FIELDS = ["gen_bus", "mbase", "pmax", "pmin", "startup", "shutdown", "ncost", "cost"]#"qmin", "qmax"]
-BUS_EQ_FIELDS = ["bus_i", "index", "base_kv", "vmin", "vmax"] #, "name", "bus_type"]
-BRANCH_EQ_FIELDS = ["f_bus", "t_bus", "br_status", "br_r", "br_x"] #"transformer"]
-#=    "g_to",
-    "g_fr",
-    "b_fr",
-    "b_to",
-    "angmin",
-    "angmax",
-]=#
+GEN_EQ_FIELDS = ["gen_bus", "mbase", "pmax", "pmin", "startup", "shutdown", "ncost", "cost"]
+BUS_EQ_FIELDS = ["bus_i", "index", "base_kv", "vmin", "vmax"]
+BRANCH_EQ_FIELDS = ["f_bus", "t_bus", "br_status", "br_r", "br_x"]
 COMPARISON_CATS = [
     "bus",
     "branch",
@@ -68,6 +61,7 @@ function compare_pm_pmi(fname::String)
     end
     sys = System(fname)
     pmi_data = PMI.get_pm_data(sys)
+    pm_map = PMI.get_pm_map(sys)
 
     # there is no guarantee that we represent all data categories that PM does, so filter by the ones we care about
     pm_cats = intersect(COMPARISON_CATS, keys(pm_data))
@@ -89,6 +83,7 @@ function compare_pm_pmi(fname::String)
                             join(strip.(string.(d["source_id"])), "-") ==
                             join(strip.(string.(pmd["source_id"])), "-"),
                     )
+                    @test isempty(setdiff(keys(pmi_devices), keys(pm_map[cat])))
                 elseif cat == "bus"
                     compare_devices(
                         pm_devices,
@@ -96,6 +91,7 @@ function compare_pm_pmi(fname::String)
                         BUS_EQ_FIELDS,
                         (d, pmd) -> d["index"] == pmd["index"],
                     )
+                    @test isempty(setdiff(keys(pmi_devices), keys(pm_map[cat])))
                 elseif cat == "branch"
                     compare_devices(
                         pm_devices,
@@ -103,6 +99,7 @@ function compare_pm_pmi(fname::String)
                         BRANCH_EQ_FIELDS,
                         select_matching_br,
                     )
+                    @test isempty(setdiff(keys(pmi_devices), keys(pm_map[cat])))
                 end
             end
         end

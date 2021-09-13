@@ -48,9 +48,7 @@ function get_pm_map(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
 
     for bus in buses
         number = PSY.get_number(bus)
-        if PSY.get_bustype(bus) != PSY.BusTypes.ISOLATED::PSY.BusTypes
-            pm_map["$number"] = bus
-        end
+        pm_map["$number"] = bus
     end
     return pm_map
 end
