@@ -96,7 +96,8 @@ function get_device_to_pm(
     device_formulation::Type{D},
 ) where {D <: Any, T <: PSY.ThermalGen}
     PM_gen = pm_gen_core(gen, ix)
-    ramp = PSY.get_ramp_limits(gen).up
+    ramplims = PSY.get_ramp_limits(gen)
+    ramp = isnothing(ramplims) ? 9999.0 : getfield(ramplims, :up)
     merge!(
         PM_gen,
         Dict{String, Any}(
@@ -167,8 +168,8 @@ function get_time_series_to_pm!(
     start_time::Dates.DateTime,
     time_periods::Int,
 ) where {T <: PSY.RenewableGen}
-    psy_forecast_name = "max_active_power"
-    pm_field_name = "pmax"
+    psy_forecast_name = "max_active_power" # change this line for different forecasts
+    pm_field_name = "pmax"# change this line to apply forecast to different fields
 
     ts_data = get_time_series_values(
         Deterministic,

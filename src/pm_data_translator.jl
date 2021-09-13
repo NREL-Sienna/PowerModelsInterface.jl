@@ -134,7 +134,7 @@ function apply_time_series(
     sys::PSY.System,
     start_time::Dates.DateTime,
     time_periods::Int,
-    template::Any,
+    template::Any = default_template(),
 )
     pm_data = PM._IM.ismultinetwork(pm_data) ? pm_data : PM.replicate(pm_data, time_periods)
     @assert length(pm_data["nw"]) == time_periods

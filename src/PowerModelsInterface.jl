@@ -6,7 +6,7 @@ import Dates
 
 # PMI exports
 export get_pm_data
-#export apply_time_series!
+#export apply_time_series
 #export apply_time_period!
 
 # PowerModels exports

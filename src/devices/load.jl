@@ -38,8 +38,8 @@ function get_time_series_to_pm!(
     start_time::Dates.DateTime,
     time_periods::Int,
 ) where {T <: PSY.StaticLoad}
-    psy_forecast_name = "max_active_power"
-    pm_field_name = "pd"
+    psy_forecast_name = "max_active_power" # change this line for different forecasts
+    pm_field_name = "pd" # change this line to apply forecast to different fields
 
     ts_data = PSY.get_time_series_values(
         PSY.Deterministic,
