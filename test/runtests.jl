@@ -136,7 +136,7 @@ function run_tests()
             @includetests ARGS
         end
 
-        @test length(IS.get_log_events(multi_logger.tracker, Logging.Error)) == 0
+        @test length(IS.get_log_events(multi_logger.tracker, Logging.Error)) == 1
         @info IS.report_log_summary(multi_logger)
     end
 end
