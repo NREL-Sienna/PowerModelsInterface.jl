@@ -1,76 +1,114 @@
+function bus_gen_values(data, solution, value_key)
+    bus_pg = Dict(i => 0.0 for (i, bus) in data["bus"])
+    for (i, gen) in data["gen"]
+        bus_pg["$(gen["gen_bus"])"] += solution["gen"][i][value_key]
+    end
+    return bus_pg
+end
+
 @testset "Test Power Flow" begin
+    file = joinpath(PM_DATA_DIR, "matpower", "case5.m")
     for (model, solver) in MODEL_SOLVER_MAP
-        result = run_pf("../test/data/matpower/case5.m", model, solver)
+        pm_result = run_pf(file, model, solver)
+        pmi_result = run_pf(System(file), model, solver)
 
-        @test result["termination_status"] == LOCALLY_SOLVED
-        @test isapprox(result["objective"], 0; atol = 1e-2)
-
-        result = run_pf(System("../test/data/matpower/case5.m"), model, solver)
-
-        @test result["termination_status"] == LOCALLY_SOLVED
-        @test isapprox(result["objective"], 0; atol = 1e-2)
+        @test pm_result["termination_status"] == pmi_result["termination_status"]
+        @test isapprox(pm_result["objective"], pmi_result["objective"]; atol = 1e-2)
     end
 end
 
 @testset "Test Optimal PowerFlow" begin
+    file = joinpath(PM_DATA_DIR, "matpower", "case5.m")
+    data = PowerModels.parse_file(file)
+    pmi_data = PMI.get_pm_data(System(file))
+
+    #TODO: add angle limits to transformers in PSY
+    for (ix, b) in pmi_data["branch"]
+        b["angmin"] = deg2rad(-30.0)
+        b["angmax"] = deg2rad(30.0)
+    end
+
     for (model, solver) in MODEL_SOLVER_MAP
-        result = run_opf("../test/data/matpower/case5.m", model, solver)
+        pm_result = run_opf(data, model, solver)
+        pmi_result = run_opf(pmi_data, model, solver)
 
-        @test result["termination_status"] == OPTIMAL
-        @test isapprox(result["objective"], 15051.4; atol = 1e1)
-
-        result = run_opf(System("../test/data/matpower/case5.m"), model, solver)
-
-        @test result["termination_status"] == OPTIMAL
-        @test isapprox(result["objective"], 15051.4; atol = 1e1)
+        @test pm_result["termination_status"] == pmi_result["termination_status"]
+        @test isapprox(pm_result["objective"], pmi_result["objective"]; atol = 1e1)
     end
 end
 
 @testset "Test DC PowerFlow" begin
-    file = "../test/data/matpower/case5.m"
-    result_pm = run_dc_pf(PowerModels.parse_file(file), ipopt_solver)
-    pm_native = compute_dc_pf(System("file"))
-    pm_opt = run_dc_pf(System("file"), ipopt_solver)
+    file = joinpath(PM_DATA_DIR, "matpower", "case5.m")
+    data = PowerModels.parse_file(file)
+    pm_native = compute_dc_pf(data)
+    pm_opt = run_dc_pf(data, ipopt_solver)
+    ps_native = compute_dc_pf(System(file))
+    ps_opt = run_dc_pf(System(file), ipopt_solver)
+
+    @test ps_opt["termination_status"] == pm_opt["termination_status"] == LOCALLY_SOLVED
 
     for (i, bus) in data["bus"]
-        result_pm = result["solution"]["bus"][i]["va"]
-        pm_native = result["solution"]["bus"][i]["va"]
-        pm_opt = native["solution"]["bus"][i]["va"]
-        @test isapprox(result_pm, pm_native; atol = 1e-10)
-        @test isapprox(result_pm, pm_opt; atol = 1e-10)
+        @test isapprox(
+            pm_opt["solution"]["bus"][i]["va"],
+            ps_opt["solution"]["bus"][i]["va"];
+            atol = 1e-7,
+        )
+        @test isapprox(
+            pm_native["solution"]["bus"][i]["va"],
+            ps_native["solution"]["bus"][i]["va"];
+            atol = 1e-7,
+        )
     end
 end
 
 @testset "5-bus case" begin
-    file = "../test/data/matpower/case5.m"
-    result_pm = run_ac_pf(PowerModels.parse_file(file), ipopt_solver)
-    pm_native = compute_ac_pf(System(file))
-    pm_opt = run_ac_pf(System(file), ipopt_solver)
+    file = joinpath(PM_DATA_DIR, "matpower", "case5.m")
+    data = PowerModels.parse_file(file)
+    pm_native = compute_ac_pf(data)
+    pm_opt = run_ac_pf(data, ipopt_solver)
+    pmi_data = PMI.get_pm_data(System(file))
+    ps_native = compute_ac_pf(pmi_data)
+    ps_opt = run_ac_pf(pmi_data, ipopt_solver)
 
-    @test pm_opt["termination_status"] == LOCALLY_SOLVED
+    @test ps_opt["termination_status"] == pm_opt["termination_status"] == LOCALLY_SOLVED
 
-    bus_pg_pm = bus_gen_values(data, result_pm["solution"], "pg")
-    bus_pg_pm = bus_gen_values(data, result_pm["solution"], "qg")
+    bus_pg_pm_opt = bus_gen_values(data, pm_opt["solution"], "pg")
+    bus_qg_pm_opt = bus_gen_values(data, pm_opt["solution"], "qg")
 
-    bus_pg_native = bus_gen_values(data, pm_native["solution"], "pg")
-    bus_qg_native = bus_gen_values(data, pm_native["solution"], "qg")
+    bus_pg_pm_native = bus_gen_values(data, pm_native["solution"], "pg")
+    bus_qg_pm_native = bus_gen_values(data, pm_native["solution"], "qg")
 
-    bus_pg_native = bus_gen_values(data, pm_native["solution"], "pg")
-    bus_qg_native = bus_gen_values(data, pm_native["solution"], "qg")
+    bus_pg_ps_opt = bus_gen_values(pmi_data, ps_opt["solution"], "pg")
+    bus_qg_ps_opt = bus_gen_values(pmi_data, ps_opt["solution"], "qg")
+
+    bus_pg_ps_native = bus_gen_values(pmi_data, ps_native["solution"], "pg")
+    bus_qg_ps_native = bus_gen_values(pmi_data, ps_native["solution"], "qg")
 
     for (i, bus) in data["bus"]
         @test isapprox(
-            result["solution"]["bus"][i]["va"],
-            native["solution"]["bus"][i]["va"];
+            pm_opt["solution"]["bus"][i]["va"],
+            ps_opt["solution"]["bus"][i]["va"];
             atol = 1e-7,
         )
         @test isapprox(
-            result["solution"]["bus"][i]["vm"],
-            native["solution"]["bus"][i]["vm"];
+            pm_opt["solution"]["bus"][i]["vm"],
+            ps_opt["solution"]["bus"][i]["vm"];
+            atol = 1e-7,
+        )
+        @test isapprox(
+            pm_native["solution"]["bus"][i]["va"],
+            ps_native["solution"]["bus"][i]["va"];
+            atol = 1e-7,
+        )
+        @test isapprox(
+            pm_native["solution"]["bus"][i]["vm"],
+            ps_native["solution"]["bus"][i]["vm"];
             atol = 1e-7,
         )
 
-        @test isapprox(bus_pg_nlp[i], bus_pg_nls[i]; atol = 1e-6)
-        @test isapprox(bus_qg_nlp[i], bus_qg_nls[i]; atol = 1e-6)
+        @test isapprox(bus_pg_pm_opt[i], bus_pg_ps_opt[i]; atol = 1e-6)
+        @test isapprox(bus_qg_pm_opt[i], bus_qg_ps_opt[i]; atol = 1e-2)
+        @test isapprox(bus_pg_pm_native[i], bus_pg_ps_native[i]; atol = 1e-6)
+        @test isapprox(bus_qg_pm_native[i], bus_qg_ps_native[i]; atol = 1e-2)
     end
 end

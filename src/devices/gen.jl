@@ -108,6 +108,7 @@ function get_device_to_pm(
             "ramp_10" => ramp,
             "ramp_30" => ramp,
             "qmin" => PSY.get_reactive_power_limits(gen).min,
+            "gen_status" => Int(PSY.get_status(gen)),
         ),
     )
     add_pm_cost!(PM_gen, PSY.get_operation_cost(gen), gen.internal.units_info.base_value)

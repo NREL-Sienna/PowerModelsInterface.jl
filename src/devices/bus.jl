@@ -23,9 +23,8 @@ function get_device_to_pm(
         "va" => PSY.get_angle(bus),
         "vm" => PSY.get_magnitude(bus),
         "base_kv" => PSY.get_base_voltage(bus),
-        "inj_p" => 0.0,
-        "inj_q" => 0.0,
         "name" => PSY.get_name(bus),
+        "source_id" => ["bus", PSY.get_number(bus)],
     )
 
     return PM_bus

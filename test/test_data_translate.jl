@@ -3,9 +3,20 @@
 # test PMmap
 # test time series data insertion
 
-GEN_EQ_FIELDS = ["gen_bus", "mbase", "pmax", "pmin", "startup", "shutdown", "ncost", "cost"]
+GEN_EQ_FIELDS = [
+    "gen_bus",
+    "mbase",
+    "pmax",
+    "pmin",
+    "startup",
+    "shutdown",
+    "ncost",
+    "cost",
+    "gen_status",
+    "model",
+]#"pg", "qg", "vg", "qmax", "qmin"]
 BUS_EQ_FIELDS = ["bus_i", "index", "base_kv", "vmin", "vmax"]
-BRANCH_EQ_FIELDS = ["f_bus", "t_bus", "br_status", "br_r", "br_x"]
+BRANCH_EQ_FIELDS = ["f_bus", "t_bus", "br_status", "br_r", "br_x", "b_fr", "b_to"]#"angmin", "angmax",]#"g_to", "g_fr", "shift", "transformer", "tap", "rate_a", "rate_b", "rate_c"]
 COMPARISON_CATS = [
     "bus",
     "branch",
@@ -26,10 +37,12 @@ COMPARISON_CATS = [
 function compare_devices(pm_devices, pmi_devices, fields, match_expr)
     for (ix, pm_device) in pm_devices
         pmi_device_match = [d for (k, d) in pmi_devices if match_expr(d, pm_device)]
+        @assert length(pmi_device_match) == 1
         for pmi_device in pmi_device_match
             match = true
             for field in fields
                 if haskey(pm_device, field)
+                    #@show ix, pmi_device["index"], field, pm_device[field] == pmi_device[field]
                     match = isapprox(pm_device[field], pmi_device[field], atol = 0.01)
                     !match && @show ix, field, pm_device[field], pmi_device[field]
                     !match && break
@@ -40,16 +53,18 @@ function compare_devices(pm_devices, pmi_devices, fields, match_expr)
     end
 end
 
-function select_matching_br(pmi_device, pm_device)
-    br_type = first(pmi_device["source_id"])
-    first(pm_device["source_id"]) != br_type && return false
-
-    if br_type == "transformer"
-        id = last(split(pmi_device["source_id"][end - 1], "_"))
-    else
-        id = replace(last(split(pmi_device["source_id"][end], "_")), "Branch " => "")
+function get_pm_br_ids(pmi_devices)
+    pm_br_ids = Dict()
+    for (k, br) in pmi_devices
+        br_type = first(br["source_id"])
+        if br_type == "transformer"
+            id = last(split(br["source_id"][end - 1], "_"))
+        else
+            id = replace(last(split(br["source_id"][end], "_")), "Branch " => "")
+        end
+        pm_br_ids[k] = id
     end
-    return pm_device["index"] == parse(Int, id)
+    return pm_br_ids
 end
 
 function compare_pm_pmi(fname::String)
@@ -65,6 +80,7 @@ function compare_pm_pmi(fname::String)
 
     # there is no guarantee that we represent all data categories that PM does, so filter by the ones we care about
     pm_cats = intersect(COMPARISON_CATS, keys(pm_data))
+    endswith(fname, "matpower/case3.m") && setdiff!(pm_cats, ["areas"]) # TODO: dont compare areas pending https://github.com/lanl-ansi/PowerModels.jl/pull/788
 
     @test isempty(setdiff(pm_cats, keys(pmi_data)))
     for cat in pm_cats
@@ -93,11 +109,12 @@ function compare_pm_pmi(fname::String)
                     )
                     @test isempty(setdiff(keys(pmi_devices), keys(pm_map[cat])))
                 elseif cat == "branch"
+                    pm_br_ids = get_pm_br_ids(pmi_devices)
                     compare_devices(
                         pm_devices,
                         pmi_devices,
                         BRANCH_EQ_FIELDS,
-                        select_matching_br,
+                        (d, pmd) -> pm_br_ids[string(d["index"])] == string(pmd["index"]),
                     )
                     @test isempty(setdiff(keys(pmi_devices), keys(pm_map[cat])))
                 end
