@@ -1,6 +1,6 @@
 name = "PowerModelsInterface"
 uuid = "7a4b9400-1441-4f08-9626-3f96e0a9a29b"
-authors = ["Jose Daniel Lara <jdlara@berkeley.edu>"]
+authors = ["Jose Daniel Lara <jdlara@berkeley.edu>", "Clayton Barrows"]
 version = "0.1.0"
 
 [deps]

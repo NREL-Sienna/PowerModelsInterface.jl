@@ -22,12 +22,6 @@ end
     data = PowerModels.parse_file(file)
     pmi_data = PMI.get_pm_data(System(file))
 
-    #TODO: add angle limits to transformers in PSY
-    for (ix, b) in pmi_data["branch"]
-        b["angmin"] = deg2rad(-30.0)
-        b["angmax"] = deg2rad(30.0)
-    end
-
     for (model, solver) in MODEL_SOLVER_MAP
         pm_result = run_opf(data, model, solver)
         pmi_result = run_opf(pmi_data, model, solver)

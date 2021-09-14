@@ -22,8 +22,8 @@ function get_device_to_pm(
         "t_bus" => t_bus,
         "b_to" => PSY.get_primary_shunt(branch),
         "index" => ix,
-        "angmin" => -π / 2,
-        "angmax" => π / 2,
+        "angmin" => -π / 4,
+        "angmax" => π / 4,
         "transformer" => true,
         "tap" => PSY.get_tap(branch),
     )
@@ -81,8 +81,8 @@ function get_device_to_pm(
         "t_bus" => t_bus,
         "b_to" => PSY.get_primary_shunt(branch),
         "index" => ix,
-        "angmin" => -π / 2,
-        "angmax" => π / 2,
+        "angmin" => -π / 4,
+        "angmax" => π / 4,
         "transformer" => true,
         "tap" => 1.0,
     )
@@ -140,8 +140,8 @@ function get_device_to_pm(
         "t_bus" => t_bus,
         "b_to" => PSY.get_primary_shunt(branch),
         "index" => ix,
-        "angmin" => -π / 2,
-        "angmax" => π / 2,
+        "angmin" => -π / 4,
+        "angmax" => π / 4,
         "transformer" => true,
         "tap" => PSY.get_tap(branch),
     )
