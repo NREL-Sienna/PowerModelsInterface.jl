@@ -1,9 +1,5 @@
 
-function get_component_to_pm(
-    ix::Int,
-    branch::PSY.PhaseShiftingTransformer,
-    device_formulation::Type{D},
-) where {D <: Any}
+function get_component_to_pm(ix::Int, branch::PSY.PhaseShiftingTransformer)
     f_bus = PSY.get_number(PSY.get_arc(branch).from)
     t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(
@@ -30,11 +26,7 @@ function get_component_to_pm(
     return PM_branch
 end
 
-function get_component_to_pm(
-    ix::Int,
-    branch::PSY.Transformer2W,
-    device_formulation::Type{D},
-) where {D <: Any}
+function get_component_to_pm(ix::Int, branch::PSY.Transformer2W)
     f_bus = PSY.get_number(PSY.get_arc(branch).from)
     t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(
@@ -61,11 +53,7 @@ function get_component_to_pm(
     return PM_branch
 end
 
-function get_component_to_pm(
-    ix::Int,
-    branch::PSY.TapTransformer,
-    device_formulation::Type{D},
-) where {D <: Any}
+function get_component_to_pm(ix::Int, branch::PSY.TapTransformer)
     f_bus = PSY.get_number(PSY.get_arc(branch).from)
     t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(
@@ -92,11 +80,7 @@ function get_component_to_pm(
     return PM_branch
 end
 
-function get_component_to_pm(
-    ix::Int,
-    branch::PSY.ACBranch,
-    device_formulation::Type{D},
-) where {D <: Any}
+function get_component_to_pm(ix::Int, branch::PSY.ACBranch)
     f_bus = PSY.get_number(PSY.get_arc(branch).from)
     t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(
@@ -123,11 +107,7 @@ function get_component_to_pm(
     return PM_branch
 end
 
-function get_component_to_pm(
-    ix::Int,
-    branch::PSY.HVDCLine,
-    device_formulation::Type{D},
-) where {D <: Any}
+function get_component_to_pm(ix::Int, branch::PSY.HVDCLine)
     f_bus = PSY.get_number(PSY.get_arc(branch).from)
     t_bus = PSY.get_number(PSY.get_arc(branch).to)
     PM_branch = Dict{String, Any}(

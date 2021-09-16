@@ -1,24 +1,16 @@
-function get_component_to_pm(
-    ix::Int,
-    load::L,
-    device_formulation::Type{D},
-) where {D <: Any, L <: PSY.StaticLoad}
+function get_component_to_pm(ix::Int, load::L) where {L <: PSY.StaticLoad}
     PM_load = Dict{String, Any}(
         "source_id" => ["bus", PSY.get_name(PSY.get_bus(load))],
         "load_bus" => PSY.get_number(PSY.get_bus(load)),
         "status" => Int64(PSY.get_available(load)),
-        "qd" => PSY.get_reactive_power(load), # TODO: get load from time series
-        "pd" => PSY.get_active_power(load),  # TODO: get load from time series
+        "qd" => PSY.get_reactive_power(load), # TODO: get Q load from time series
+        "pd" => PSY.get_active_power(load),
         "index" => ix,
     )
     return PM_load
 end
 
-function get_component_to_pm(
-    ix::Int,
-    shunt::L,
-    device_formulation::Type{D},
-) where {D <: Any, L <: PSY.FixedAdmittance}
+function get_component_to_pm(ix::Int, shunt::L) where {L <: PSY.FixedAdmittance}
     PM_shunt = Dict{String, Any}(
         "source_id" => ["bus", PSY.get_name(PSY.get_bus(shunt))],
         "shunt_bus" => PSY.get_number(PSY.get_bus(shunt)),

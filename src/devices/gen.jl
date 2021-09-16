@@ -90,11 +90,7 @@ function pm_gen_core(gen::T, ix::Int) where {T <: PSY.Generator}
     return PM_gen
 end
 
-function get_component_to_pm(
-    ix::Int,
-    gen::T,
-    device_formulation::Type{D},
-) where {D <: Any, T <: PSY.ThermalGen}
+function get_component_to_pm(ix::Int, gen::T) where {T <: PSY.ThermalGen}
     PM_gen = pm_gen_core(gen, ix)
     ramplims = PSY.get_ramp_limits(gen)
     ramp = isnothing(ramplims) ? 9999.0 : getfield(ramplims, :up)
@@ -115,11 +111,7 @@ function get_component_to_pm(
     return PM_gen
 end
 
-function get_component_to_pm(
-    ix::Int,
-    gen::T,
-    device_formulation::Type{D},
-) where {D <: Any, T <: PSY.RenewableGen}
+function get_component_to_pm(ix::Int, gen::T) where {T <: PSY.RenewableGen}
     PM_gen = pm_gen_core(gen, ix)
     merge!(
         PM_gen,
@@ -129,21 +121,13 @@ function get_component_to_pm(
     return PM_gen
 end
 
-function get_component_to_pm(
-    ix::Int,
-    gen::T,
-    device_formulation::Type{D},
-) where {D <: Any, T <: PSY.RenewableFix}
+function get_component_to_pm(ix::Int, gen::T) where {T <: PSY.RenewableFix}
     PM_gen = pm_gen_core(gen, ix)
     merge!(PM_gen, Dict{String, Any}("pmin" => 0.0, "qmin" => 0.0))
     return PM_gen
 end
 
-function get_component_to_pm(
-    ix::Int,
-    gen::T,
-    device_formulation::Type{D},
-) where {D <: Any, T <: PSY.HydroGen}
+function get_component_to_pm(ix::Int, gen::T) where {T <: PSY.HydroGen}
     PM_gen = pm_gen_core(gen, ix)
     ramp = PSY.get_ramp_limits(gen).up
     merge!(

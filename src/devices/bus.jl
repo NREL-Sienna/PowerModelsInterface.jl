@@ -6,11 +6,7 @@ const pm_bustypes = Dict{PSY.BusTypes, Int}(
     PSY.BusTypes.SLACK => 3,
 )
 
-function get_component_to_pm(
-    ix::Int,
-    bus::B,
-    device_formulation::Type{D},
-) where {D <: Any, B <: PSY.Bus}
+function get_component_to_pm(ix::Int, bus::B) where {B <: PSY.Bus}
     number = PSY.get_number(bus)
     PM_bus = Dict{String, Any}(
         "zone" => 1, #TODO: fill this with real data
@@ -36,7 +32,7 @@ function get_components_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
 
     for (ix, bus) in enumerate(buses)
         number = PSY.get_number(bus)
-        PM_buses["$(number)"] = get_component_to_pm(ix, bus, Any)
+        PM_buses["$(number)"] = get_component_to_pm(ix, bus)
     end
     return PM_buses
 end

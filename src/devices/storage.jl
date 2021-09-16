@@ -1,8 +1,4 @@
-function get_component_to_pm(
-    ix::Int,
-    storage::S,
-    device_formulation::Type{D},
-) where {D <: Any, S <: PSY.Storage}
+function get_component_to_pm(ix::Int, storage::S) where {S <: PSY.Storage}
     qlims = PSY.get_reactive_power_limits(storage)
     PM_storage = Dict{String, Any}(
         "x" => 0.0,

@@ -1,7 +1,5 @@
 
-# TODO: add tests
-# test PMmap
-# test time series data insertion
+# TODO: add tests for PMmap
 
 GEN_EQ_FIELDS = [
     "gen_bus",
@@ -80,7 +78,7 @@ function compare_pm_pmi(fname::String)
 
     # there is no guarantee that we represent all data categories that PM does, so filter by the ones we care about
     pm_cats = intersect(COMPARISON_CATS, keys(pm_data))
-    endswith(fname, "matpower/case3.m") && setdiff!(pm_cats, ["areas"]) # TODO: dont compare areas pending https://github.com/lanl-ansi/PowerModels.jl/pull/788
+    endswith(fname, "matpower/case3.m") && setdiff!(pm_cats, ["areas"]) #dont compare areas for case3.m, see: https://github.com/lanl-ansi/PowerModels.jl/pull/788
 
     @test isempty(setdiff(pm_cats, keys(pmi_data)))
     for cat in pm_cats

@@ -1,78 +1,34 @@
 
-function get_pm_map(sys::PSY.System, template = default_template())
+function get_pm_map(sys::PSY.System)
     pm_map = Dict{String, Any}()
-    pm_map["branch"] = get_pm_map(sys, PSY.ACBranch, template.branches)
-    pm_map["dcline"] =
-        get_pm_map(sys, PSY.DCBranch, template.branches, length(pm_map["branch"]))
+    pm_map["branch"] = get_pm_map(sys, PSY.ACBranch)
+    pm_map["dcline"] = get_pm_map(sys, PSY.DCBranch)
     pm_map["bus"] = get_pm_map(sys, PSY.Bus)
-    pm_map["shunt"] = get_pm_map(sys, PSY.FixedAdmittance, template.devices)
-    pm_map["load"] = get_pm_map(sys, PSY.StaticLoad, template.devices)
-
-    thermal = get_pm_map(sys, PSY.ThermalGen, template.devices)
-    renewable = get_pm_map(sys, PSY.ThermalGen, template.devices, length(thermal))
-    hydro =
-        get_pm_map(sys, PSY.HydroGen, template.devices, length(thermal) + length(renewable))
-    pm_map["gen"] = merge(thermal, renewable, hydro)
-
-    pm_map["storage"] = get_pm_map(sys, PSY.Storage, template.devices)
+    pm_map["shunt"] = get_pm_map(sys, PSY.FixedAdmittance)
+    pm_map["load"] = get_pm_map(sys, PSY.StaticLoad)
+    pm_map["gen"] = get_pm_map(sys, PSY.Generator)
+    pm_map["storage"] = get_pm_map(sys, PSY.Storage)
     return pm_map
 end
 
-function get_pm_map(
-    sys::PSY.System,
-    component_type::Type{T},
-    devices_template::Dict{Symbol, Any},
-    start_idx::Int = 0,
-) where {T <: PSY.Component}
+function get_pm_map(sys::PSY.System, component_type::Type{T}) where {T <: PSY.Component}
     devices = PSY.get_components(component_type, sys)
-
     PM_devices = Dict{String, component_type}()
-
-    for (d, device_model) in devices_template
-        !(device_model.component_type <: component_type) && continue
-        start_idx += length(PM_devices)
-        for (ix, device) in enumerate(devices)
-            PM_devices["$(ix)"] = device
-        end
+    for (ix, device) in enumerate(devices)
+        PM_devices["$(ix)"] = device
     end
-    return PM_devices
-end
 
-# dummy template to enable default PSY -> PM mapping but allow for more control in PSI
-function default_template()
-    template = (
-        branches = Dict{Symbol, Any}(
-            :ACBranch => (formulation = Any, component_type = PSY.ACBranch),
-            :DCBranch => (formulation = Any, component_type = PSY.DCBranch),
-        ),
-        devices = Dict{Symbol, Any}(
-            :thermal => (formulation = Any, component_type = PSY.ThermalGen),
-            :renewable => (formulation = Any, component_type = PSY.RenewableGen),
-            :load => (formulation = Any, component_type = PSY.StaticLoad),
-            :storage => (formulation = Any, component_type = PSY.Storage),
-            :shunt => (formulation = Any, component_type = PSY.FixedAdmittance),
-        ),
-        network = PM.AbstractPowerModel,
-    )
-    return template
+    return PM_devices
 end
 
 function get_components_to_pm(
     sys::PSY.System,
     device_type::Type{T},
-    devices_template::Dict{Symbol, Any},
-    system_formulation::Type{S},
-    start_idx = 0,
-) where {T <: PSY.Component, S <: PM.AbstractPowerModel}
+) where {T <: PSY.Component}
     devices = PSY.get_components(T, sys)
     PM_devices = Dict{String, Any}()
-
-    for (d, device_model) in devices_template
-        !(device_model.component_type <: device_type) && continue
-        start_idx += length(PM_devices)
-        for (ix, device) in enumerate(devices)
-            PM_devices["$(ix)"] = get_component_to_pm(ix, device, Any)
-        end
+    for (ix, device) in enumerate(devices)
+        PM_devices["$(ix)"] = get_component_to_pm(ix, device)
     end
     return PM_devices
 end
@@ -86,7 +42,6 @@ single time period, or `time_periods` to create a multi-network dataset with mul
 
 # Arguments
 - `sys::System`: PowerSystems System
-- `template::Any=default_template()`: Template to control data conversion
 
 # Key word arguments
 - `name::String`: system name
@@ -94,25 +49,16 @@ single time period, or `time_periods` to create a multi-network dataset with mul
 - `time_periods::UnitRange{Int}=1:PSY.get_forecast_horizon(sys)`: indices for selecting forecast periods. Valid extent is `1:horizon`
 - `period::Int=1`: index for selecting forecast period. Valid options
 """
-function get_pm_data(sys::PSY.System, template = default_template(); kwargs...)
+function get_pm_data(sys::PSY.System; kwargs...)
     PSY.set_units_base_system!(sys, "SYSTEM_BASE")
 
-    ac_lines = get_components_to_pm(sys, PSY.ACBranch, template.branches, template.network)
-
-    dc_lines = get_components_to_pm(
-        sys,
-        PSY.DCBranch,
-        template.branches,
-        template.network,
-        #length(ac_lines),
-    )
-
+    ac_lines = get_components_to_pm(sys, PSY.ACBranch)
+    dc_lines = get_components_to_pm(sys, PSY.DCBranch)
     pm_buses = get_components_to_pm(sys, PSY.Bus)
-    pm_shunts =
-        get_components_to_pm(sys, PSY.FixedAdmittance, template.devices, template.network)
-    pm_gens = get_components_to_pm(sys, PSY.Generator, template.devices, template.network)
-    pm_loads = get_components_to_pm(sys, PSY.StaticLoad, template.devices, template.network)
-    pm_storages = get_components_to_pm(sys, PSY.Storage, template.devices, template.network)
+    pm_shunts = get_components_to_pm(sys, PSY.FixedAdmittance)
+    pm_gens = get_components_to_pm(sys, PSY.Generator)
+    pm_loads = get_components_to_pm(sys, PSY.StaticLoad)
+    pm_storages = get_components_to_pm(sys, PSY.Storage)
     pm_areas = get_components_to_pm(sys, PSY.Area)
 
     pm_data_translation = Dict{String, Any}(
@@ -127,7 +73,7 @@ function get_pm_data(sys::PSY.System, template = default_template(); kwargs...)
         "shunt" => pm_shunts,
         "load" => pm_loads,
         "areas" => pm_areas,
-        "name" => get(kwargs, :name, ""), # TODO: add name arg to function
+        "name" => get(kwargs, :name, ""), # TODO: add name to PSY.System
         "source_type" => "PowerSystems.jl",
         "source_version" => PSY.DATA_FORMAT_VERSION,
     )
@@ -169,14 +115,13 @@ function apply_time_series(
     sys::PSY.System,
     start_time::Dates.DateTime,
     time_periods::UnitRange{Int},
-    template::Any = default_template(),
 )
     pm_data =
         PM._IM.ismultinetwork(pm_data) ? pm_data :
         PM.replicate(pm_data, length(time_periods))
     @assert length(pm_data["nw"]) == length(time_periods)
 
-    pm_map = get_pm_map(sys, template)
+    pm_map = get_pm_map(sys)
 
     for key in ["load", "gen"] #TODO: add shunt
         for (id, device) in pm_map[key]
@@ -191,9 +136,8 @@ function apply_time_period!(
     sys::PSY.System,
     start_time::Dates.DateTime,
     time_period::Int,
-    template::Any = default_template(),
 )
-    pm_map = get_pm_map(sys, template)
+    pm_map = get_pm_map(sys)
 
     for key in ["load", "gen"] #TODO: add shunt
         for (id, device) in pm_map[key]
