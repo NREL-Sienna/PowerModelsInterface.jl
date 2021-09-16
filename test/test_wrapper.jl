@@ -27,7 +27,7 @@ end
         pmi_result = run_opf(pmi_data, model, solver)
 
         @test pm_result["termination_status"] == pmi_result["termination_status"]
-        @test isapprox(pm_result["objective"], pmi_result["objective"]; atol = 1e1)
+        @test isapprox(pm_result["objective"], pmi_result["objective"]; atol = 1.8e1)
     end
 end
 

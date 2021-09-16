@@ -34,7 +34,7 @@ cbc_solver = JuMP.optimizer_with_attributes(Cbc.Optimizer, "logLevel" => 0)
 # juniper_solver = JuMP.optimizer_with_attributes(Juniper.Optimizer, "nl_solver"=>JuMP.optimizer_with_attributes(Ipopt.Optimizer, "tol"=>1e-4, "print_level"=>0), "log_levels"=>[])
 scs_solver = JuMP.optimizer_with_attributes(
     SCS.Optimizer,
-    "max_iters" => 500000,
+    #"max_iters" => 500000,
     "eps" => 1e-4,
     "verbose" => 0,
 )
