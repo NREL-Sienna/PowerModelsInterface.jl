@@ -1,4 +1,4 @@
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     storage::S,
     device_formulation::Type{D},

@@ -90,7 +90,7 @@ function pm_gen_core(gen::T, ix::Int) where {T <: PSY.Generator}
     return PM_gen
 end
 
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     gen::T,
     device_formulation::Type{D},
@@ -115,7 +115,7 @@ function get_device_to_pm(
     return PM_gen
 end
 
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     gen::T,
     device_formulation::Type{D},
@@ -129,7 +129,7 @@ function get_device_to_pm(
     return PM_gen
 end
 
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     gen::T,
     device_formulation::Type{D},
@@ -139,7 +139,7 @@ function get_device_to_pm(
     return PM_gen
 end
 
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     gen::T,
     device_formulation::Type{D},

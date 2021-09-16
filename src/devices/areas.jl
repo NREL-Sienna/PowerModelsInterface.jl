@@ -1,5 +1,5 @@
 
-function get_devices_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Area}
+function get_components_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Area}
     areas = PSY.get_components(PSY.Area, sys)
 
     PM_areas = Dict{String, Any}()

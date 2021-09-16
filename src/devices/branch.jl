@@ -1,5 +1,5 @@
 
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     branch::PSY.PhaseShiftingTransformer,
     device_formulation::Type{D},
@@ -30,35 +30,7 @@ function get_device_to_pm(
     return PM_branch
 end
 
-# TODO: move this to PSI
-#=
-function get_device_to_pm(
-    ix::Int,
-    branch::PSY.PhaseShiftingTransformer,
-    device_formulation::Type{StaticBranchUnbounded},
-)
-    PM_branch = Dict{String, Any}(
-        "br_r" => PSY.get_r(branch),
-        "shift" => PSY.get_α(branch),
-        "br_x" => PSY.get_x(branch),
-        "g_to" => 0.0,
-        "g_fr" => 0.0,
-        "b_fr" => PSY.get_primary_shunt(branch) / 2,
-        "f_bus" => PSY.get_number(PSY.get_arc(branch).from),
-        "br_status" => Float64(PSY.get_available(branch)),
-        "t_bus" => PSY.get_number(PSY.get_arc(branch).to),
-        "b_to" => PSY.get_primary_shunt(branch) / 2,
-        "index" => ix,
-        "angmin" => -π / 2,
-        "angmax" => π / 2,
-        "transformer" => true,
-        "tap" => PSY.get_tap(branch),
-    )
-    return PM_branch
-end
-=#
-
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     branch::PSY.Transformer2W,
     device_formulation::Type{D},
@@ -89,35 +61,7 @@ function get_device_to_pm(
     return PM_branch
 end
 
-# TODO: move this to PSI
-#=
-function get_device_to_pm(
-    ix::Int,
-    branch::PSY.Transformer2W,
-    device_formulation::Type{StaticBranchUnbounded},
-)
-    PM_branch = Dict{String, Any}(
-        "br_r" => PSY.get_r(branch),
-        "shift" => 0.0,
-        "br_x" => PSY.get_x(branch),
-        "g_to" => 0.0,
-        "g_fr" => 0.0,
-        "b_fr" => PSY.get_primary_shunt(branch) / 2,
-        "f_bus" => PSY.get_number(PSY.get_arc(branch).from),
-        "br_status" => Float64(PSY.get_available(branch)),
-        "t_bus" => PSY.get_number(PSY.get_arc(branch).to),
-        "b_to" => PSY.get_primary_shunt(branch) / 2,
-        "index" => ix,
-        "angmin" => -π / 2,
-        "angmax" => π / 2,
-        "transformer" => true,
-        "tap" => 1.0,
-    )
-    return PM_branch
-end
-=#
-
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     branch::PSY.TapTransformer,
     device_formulation::Type{D},
@@ -148,35 +92,7 @@ function get_device_to_pm(
     return PM_branch
 end
 
-# TODO: move this to PSI
-#=
-function get_device_to_pm(
-    ix::Int,
-    branch::PSY.TapTransformer,
-    device_formulation::Type{StaticBranchUnbounded},
-)
-    PM_branch = Dict{String, Any}(
-        "br_r" => PSY.get_r(branch),
-        "shift" => 0.0,
-        "br_x" => PSY.get_x(branch),
-        "g_to" => 0.0,
-        "g_fr" => 0.0,
-        "b_fr" => PSY.get_primary_shunt(branch) / 2,
-        "f_bus" => PSY.get_number(PSY.get_arc(branch).from),
-        "br_status" => Float64(PSY.get_available(branch)),
-        "t_bus" => PSY.get_number(PSY.get_arc(branch).to),
-        "b_to" => PSY.get_primary_shunt(branch) / 2,
-        "index" => ix,
-        "angmin" => -π / 2,
-        "angmax" => π / 2,
-        "transformer" => true,
-        "tap" => PSY.get_tap(branch),
-    )
-    return PM_branch
-end
-=#
-
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     branch::PSY.ACBranch,
     device_formulation::Type{D},
@@ -207,35 +123,7 @@ function get_device_to_pm(
     return PM_branch
 end
 
-# TODO: move this to PSI
-#=
-function get_device_to_pm(
-    ix::Int,
-    branch::PSY.ACBranch,
-    device_formulation::Type{StaticBranchUnbounded},
-)
-    PM_branch = Dict{String, Any}(
-        "br_r" => PSY.get_r(branch),
-        "shift" => 0.0,
-        "br_x" => PSY.get_x(branch),
-        "g_to" => 0.0,
-        "g_fr" => 0.0,
-        "b_fr" => PSY.get_b(branch).from,
-        "f_bus" => PSY.get_number(PSY.get_arc(branch).from),
-        "br_status" => Float64(PSY.get_available(branch)),
-        "t_bus" => PSY.get_number(PSY.get_arc(branch).to),
-        "b_to" => PSY.get_b(branch).to,
-        "index" => ix,
-        "angmin" => PSY.get_angle_limits(branch).min,
-        "angmax" => PSY.get_angle_limits(branch).max,
-        "transformer" => false,
-        "tap" => 1.0,
-    )
-    return PM_branch
-end
-=#
-
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     branch::PSY.HVDCLine,
     device_formulation::Type{D},
@@ -274,47 +162,3 @@ function get_device_to_pm(
     )
     return PM_branch
 end
-#=
-function get_pm_map(
-    sys::PSY.System,
-    branch_type::Type{T},
-    branch_template::Dict{Symbol, Any},
-    start_idx = 0,
-) where {T <: PSY.Branch}
-    PMmap_br = Dict{
-        NamedTuple{(:from_to, :to_from), Tuple{Tuple{Int, Int, Int}, Tuple{Int, Int, Int}}},
-        t where t <: T,
-    }()
-
-    for (d, device_model) in branch_template
-        !(device_model.component_type <: branch_type) && continue
-        start_idx += length(PMmap_br)
-        branches = PSY.get_components(device_model.component_type, sys)
-        for (i, branch) in enumerate(branches)
-            ix = i + start_idx
-            arc = PSY.get_arc(branch)
-            f = PSY.get_number(PSY.get_from(arc))
-            t = PSY.get_number(PSY.get_to(arc))
-            PMmap_br[(from_to = (ix, f, t), to_from = (ix, t, f))] = branch
-        end
-    end
-    return PMmap_br
-end
-=#
-# TODO: move this to PSI
-#=
-function get_branches_to_pm(
-    sys::PSY.System,
-    system_formulation::Type{PTDFPowerModel},
-    ::Type{T},
-    start_idx = 0,
-) where {T <: PSY.DCBranch}
-    PM_branches = Dict{String, Any}()
-    PMmap_br = Dict{
-        NamedTuple{(:from_to, :to_from), Tuple{Tuple{Int, Int, Int}, Tuple{Int, Int, Int}}},
-        t where t <: T,
-    }()
-
-    return PM_branches, PMmap_br
-end
-=#

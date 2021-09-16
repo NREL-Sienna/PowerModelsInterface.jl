@@ -1,4 +1,4 @@
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     load::L,
     device_formulation::Type{D},
@@ -14,7 +14,7 @@ function get_device_to_pm(
     return PM_load
 end
 
-function get_device_to_pm(
+function get_component_to_pm(
     ix::Int,
     shunt::L,
     device_formulation::Type{D},

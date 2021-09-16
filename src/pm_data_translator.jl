@@ -57,7 +57,7 @@ function default_template()
     return template
 end
 
-function get_devices_to_pm(
+function get_components_to_pm(
     sys::PSY.System,
     device_type::Type{T},
     devices_template::Dict{Symbol, Any},
@@ -71,7 +71,7 @@ function get_devices_to_pm(
         !(device_model.component_type <: device_type) && continue
         start_idx += length(PM_devices)
         for (ix, device) in enumerate(devices)
-            PM_devices["$(ix)"] = get_device_to_pm(ix, device, Any)
+            PM_devices["$(ix)"] = get_component_to_pm(ix, device, Any)
         end
     end
     return PM_devices
@@ -97,9 +97,9 @@ single time period, or `time_periods` to create a multi-network dataset with mul
 function get_pm_data(sys::PSY.System, template = default_template(); kwargs...)
     PSY.set_units_base_system!(sys, "SYSTEM_BASE")
 
-    ac_lines = get_devices_to_pm(sys, PSY.ACBranch, template.branches, template.network)
+    ac_lines = get_components_to_pm(sys, PSY.ACBranch, template.branches, template.network)
 
-    dc_lines = get_devices_to_pm(
+    dc_lines = get_components_to_pm(
         sys,
         PSY.DCBranch,
         template.branches,
@@ -107,13 +107,13 @@ function get_pm_data(sys::PSY.System, template = default_template(); kwargs...)
         #length(ac_lines),
     )
 
-    pm_buses = get_devices_to_pm(sys, PSY.Bus)
+    pm_buses = get_components_to_pm(sys, PSY.Bus)
     pm_shunts =
-        get_devices_to_pm(sys, PSY.FixedAdmittance, template.devices, template.network)
-    pm_gens = get_devices_to_pm(sys, PSY.Generator, template.devices, template.network)
-    pm_loads = get_devices_to_pm(sys, PSY.StaticLoad, template.devices, template.network)
-    pm_storages = get_devices_to_pm(sys, PSY.Storage, template.devices, template.network)
-    pm_areas = get_devices_to_pm(sys, PSY.Area)
+        get_components_to_pm(sys, PSY.FixedAdmittance, template.devices, template.network)
+    pm_gens = get_components_to_pm(sys, PSY.Generator, template.devices, template.network)
+    pm_loads = get_components_to_pm(sys, PSY.StaticLoad, template.devices, template.network)
+    pm_storages = get_components_to_pm(sys, PSY.Storage, template.devices, template.network)
+    pm_areas = get_components_to_pm(sys, PSY.Area)
 
     pm_data_translation = Dict{String, Any}(
         "bus" => pm_buses,
