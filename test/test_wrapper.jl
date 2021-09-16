@@ -9,11 +9,13 @@ end
 @testset "Test Power Flow" begin
     file = joinpath(PM_DATA_DIR, "matpower", "case5.m")
     for (model, solver) in MODEL_SOLVER_MAP
-        pm_result = run_pf(file, model, solver)
-        pmi_result = run_pf(System(file), model, solver)
+        @testset "Testing $model with $(solver.optimizer_constructor.name.module)" begin
+            pm_result = run_pf(file, model, solver)
+            pmi_result = run_pf(System(file), model, solver)
 
-        @test pm_result["termination_status"] == pmi_result["termination_status"]
-        @test isapprox(pm_result["objective"], pmi_result["objective"]; atol = 1e-2)
+            @test pm_result["termination_status"] == pmi_result["termination_status"]
+            @test isapprox(pm_result["objective"], pmi_result["objective"]; atol = 1e-2)
+        end
     end
 end
 
