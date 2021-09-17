@@ -104,16 +104,25 @@ function get_time_series_to_pm!(
     pm_category::String,
     pm_id::String,
     device::T,
-    start_time::Dates.DateTime,
+    initial_time::Dates.DateTime,
     time_periods::Union{UnitRange{Int}, Int},
 ) where {T <: PSY.Component}
     return # do nothing by default
 end
 
+"""
+Applies time series data from a PowerSystems `System` to a PowerModels data dictionary.
+
+# Arguments
+- `pm_data::Dict{String, Any}`: PowerModels dictionary data
+- `sys::System`: PowerSystems System
+- `initial_time::Dates.DateTime`: initial time of `Forecast`
+- `time_periods::UnitRange{Int}`: time period indices of `Forecast`
+"""
 function apply_time_series(
     pm_data::Dict{String, Any},
     sys::PSY.System,
-    start_time::Dates.DateTime,
+    initial_time::Dates.DateTime,
     time_periods::UnitRange{Int},
 )
     pm_data =
@@ -125,23 +134,32 @@ function apply_time_series(
 
     for key in ["load", "gen"] #TODO: add shunt
         for (id, device) in pm_map[key]
-            get_time_series_to_pm!(pm_data, key, id, device, start_time, time_periods)
+            get_time_series_to_pm!(pm_data, key, id, device, initial_time, time_periods)
         end
     end
     return pm_data
 end
 
+"""
+Applies a single time period of time series data from a PowerSystems `System` to a PowerModels data dictionary.
+
+# Arguments
+- `pm_data::Dict{String, Any}`: PowerModels dictionary data
+- `sys::System`: PowerSystems System
+- `initial_time::Dates.DateTime`: initial time of `Forecast`
+- `time_period::Int`: time period index of `Forecast`
+"""
 function apply_time_period!(
     pm_data::Dict{String, Any},
     sys::PSY.System,
-    start_time::Dates.DateTime,
+    initial_time::Dates.DateTime,
     time_period::Int,
 )
     pm_map = get_pm_map(sys)
 
     for key in ["load", "gen"] #TODO: add shunt
         for (id, device) in pm_map[key]
-            get_time_series_to_pm!(pm_data, key, id, device, start_time, time_period)
+            get_time_series_to_pm!(pm_data, key, id, device, initial_time, time_period)
         end
     end
     return pm_data

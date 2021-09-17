@@ -27,7 +27,7 @@ function get_time_series_to_pm!(
     pm_category::String,
     pm_id::String,
     device::T,
-    start_time::Dates.DateTime,
+    initial_time::Dates.DateTime,
     time_periods::UnitRange{Int},
 ) where {T <: PSY.StaticLoad}
     psy_forecast_name = "max_active_power" # change this line for different forecasts
@@ -37,7 +37,7 @@ function get_time_series_to_pm!(
         PSY.Deterministic,
         device,
         psy_forecast_name,
-        start_time = start_time,
+        initial_time = initial_time,
         len = last(time_periods),
     )
     if haskey(pm_data, "nw")
@@ -62,7 +62,7 @@ function get_time_series_to_pm!(
     pm_category::String,
     pm_id::String,
     device::T,
-    start_time::Dates.DateTime,
+    initial_time::Dates.DateTime,
     time_period::Int,
 ) where {T <: PSY.StaticLoad}
     psy_forecast_name = "max_active_power" # change this line for different forecasts
@@ -72,7 +72,7 @@ function get_time_series_to_pm!(
         PSY.Deterministic,
         device,
         psy_forecast_name,
-        start_time = start_time,
+        initial_time = initial_time,
         len = time_period,
     )
     if haskey(pm_data, "nw")

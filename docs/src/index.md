@@ -1,17 +1,32 @@
 # PowerModelsInterface.jl
 
-[![codecov](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl)
-
-PowerModelsInterface.jl is a Julia package for accessing routines from [PowerModels.jl](https://github.com/lanl-ansi/PowerModels.jl) with data contained in [PowerSystems.jl](https://github.com/nrel-siip/PowerSystems.jl).
-
-## Installation
-
-```julia
-julia> ]
-(v1.6) pkg> add https://github.com/nrel-siip/PowerModelsInterfaces.jl
+```@meta
+CurrentModule = PowerModelsInterface
 ```
 
-## Usage
+### Overview
+
+`PowerModelsInterface.jl` is a [`Julia`](http://www.julialang.org) package that provides
+an interface between [PowerSystems.jl](https://github.com/NREL-SIIP/PowerSystems.jl) and
+[PowerModels.jl](https://github.com/lanl-ansi/PowerModels.jl). `PowerModelsInterface.jl` has
+been developed under NREL's [SIIP Initiative](https://github.com/NREL-SIIP).
+
+### Installation
+
+The latest stable release of `PowerModelsInterface.jl` can be installed using the Julia
+package manager with
+
+```Julia
+] add PowerModelsInterface
+```
+
+For the current development version, "checkout" this package with
+
+```Julia
+] add PowerModelsInterface#master
+```
+
+### Usage
 
 `PowerModelsInterface.jl` allows users to translate [PowerSystems.jl](https://github.com/NREL-SIIP/PowerSystems.jl) data into `PowerModels.jl` format and provides interfaces to key `PowerModels.jl` modeling functions. In particular, `PowerModelsInterface.jl` has three main capabilities:
 
@@ -57,11 +72,6 @@ run_mn_opf(
 )
 ```
 
-## Development
-
-Contributions to the development and enahancement of PowerSimulations is welcome. Please see [CONTRIBUTING.md](https://github.com/NREL-SIIP/PowerSimulations.jl/blob/master/CONTRIBUTING.md) for code contribution guidelines.
-
-## License
-
-PowerSimulations is released under a BSD [license](https://github.com/NREL/PowerSimulations.jl/blob/master/LICENSE). PowerSimulations has been developed as part of the Scalable Integrated Infrastructure Planning (SIIP)
-initiative at the U.S. Department of Energy's National Renewable Energy Laboratory ([NREL](https://www.nrel.gov/))
+------------
+PowerModelsInterface has been developed as part of the [Scalable Integrated Infrastructure Planning (SIIP) initiative](https://www.nrel.gov/analysis/siip.html) at the U.S. Department of Energy's National Renewable Energy Laboratory
+([NREL](https://www.nrel.gov/))
