@@ -26,7 +26,7 @@ function get_component_to_pm(ix::Int, bus::PSY.Bus)
     return PM_bus
 end
 
-function get_components_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
+function get_components_to_pm(sys::PSY.System, ::Type{PSY.Bus})
     buses = PSY.get_components(PSY.Bus, sys)
     PM_buses = Dict{String, Any}()
 
