@@ -21,13 +21,18 @@ Aqua.test_unbound_args(PowerModelsInterface)
 Aqua.test_undefined_exports(PowerModelsInterface)
 Aqua.test_ambiguities(PowerModelsInterface)
 
-ipopt_solver =
-    JuMP.optimizer_with_attributes(Ipopt.Optimizer, "tol" => 1e-6, "print_level" => 0)
+ipopt_solver = JuMP.optimizer_with_attributes(
+    Ipopt.Optimizer,
+    "tol" => 1e-6,
+    "print_level" => 0,
+    "max_iter" => 10000,
+)
 ipopt_ws_solver = JuMP.optimizer_with_attributes(
     Ipopt.Optimizer,
     "tol" => 1e-6,
     "mu_init" => 1e-4,
     "print_level" => 0,
+    "max_iter" => 10000,
 )
 
 cbc_solver = JuMP.optimizer_with_attributes(Cbc.Optimizer, "logLevel" => 0)
