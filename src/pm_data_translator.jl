@@ -104,7 +104,7 @@ function get_time_series_to_pm!(
     pm_data::Dict{String, Any},
     pm_category::String,
     pm_id::String,
-    device::T,
+    component::T,
     start_time::Dates.DateTime,
     time_periods::Union{UnitRange{Int}, Int},
 ) where {T <: PSY.Component}
