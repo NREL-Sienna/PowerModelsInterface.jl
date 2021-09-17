@@ -2,7 +2,7 @@ function get_component_to_pm(ix::Int, load::L) where {L <: PSY.StaticLoad}
     PM_load = Dict{String, Any}(
         "source_id" => ["bus", PSY.get_name(PSY.get_bus(load))],
         "load_bus" => PSY.get_number(PSY.get_bus(load)),
-        "status" => Int64(PSY.get_available(load)),
+        "status" => Int(PSY.get_available(load)),
         "qd" => PSY.get_reactive_power(load), # TODO: get Q load from time series
         "pd" => PSY.get_active_power(load),
         "index" => ix,
