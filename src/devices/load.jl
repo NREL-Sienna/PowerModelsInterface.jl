@@ -14,7 +14,7 @@ function get_component_to_pm(ix::Int, shunt::L) where {L <: PSY.FixedAdmittance}
     PM_shunt = Dict{String, Any}(
         "source_id" => ["bus", PSY.get_name(PSY.get_bus(shunt))],
         "shunt_bus" => PSY.get_number(PSY.get_bus(shunt)),
-        "status" => Int64(PSY.get_available(shunt)),
+        "status" => Int(PSY.get_available(shunt)),
         "gs" => real(PSY.get_Y(shunt)),
         "bs" => imag(PSY.get_Y(shunt)),
         "index" => ix,
