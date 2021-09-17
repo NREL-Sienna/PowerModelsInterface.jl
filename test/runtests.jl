@@ -23,16 +23,16 @@ Aqua.test_ambiguities(PowerModelsInterface)
 
 ipopt_solver = JuMP.optimizer_with_attributes(
     Ipopt.Optimizer,
-    "tol" => 1e-6,
+    "tol" => 1e-4,
     "print_level" => 0,
-    "max_iter" => 10000,
+    "max_iter" => 100000,
 )
 ipopt_ws_solver = JuMP.optimizer_with_attributes(
     Ipopt.Optimizer,
-    "tol" => 1e-6,
+    "tol" => 1e-4,
     "mu_init" => 1e-4,
     "print_level" => 0,
-    "max_iter" => 10000,
+    "max_iter" => 100000,
 )
 
 cbc_solver = JuMP.optimizer_with_attributes(Cbc.Optimizer, "logLevel" => 0)
