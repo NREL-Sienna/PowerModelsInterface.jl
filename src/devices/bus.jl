@@ -6,7 +6,7 @@ const pm_bustypes = Dict{PSY.BusTypes, Int}(
     PSY.BusTypes.SLACK => 3,
 )
 
-function get_component_to_pm(ix::Int, bus::B) where {B <: PSY.Bus}
+function get_component_to_pm(ix::Int, bus::PSY.Bus)
     number = PSY.get_number(bus)
     PM_bus = Dict{String, Any}(
         "zone" => 1, #TODO: fill this with real data
