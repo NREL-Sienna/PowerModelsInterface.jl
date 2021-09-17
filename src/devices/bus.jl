@@ -1,18 +1,10 @@
-const pm_bustypes = Dict{PSY.BusTypes, Int}(
-    PSY.BusTypes.ISOLATED => 4,
-    PSY.BusTypes.PQ => 1,
-    PSY.BusTypes.PV => 2,
-    PSY.BusTypes.REF => 3,
-    PSY.BusTypes.SLACK => 3,
-)
-
 function get_component_to_pm(ix::Int, bus::PSY.Bus)
     number = PSY.get_number(bus)
     zone = PSY.get_load_zone(bus)
     PM_bus = Dict{String, Any}(
         "zone" => isnothing(zone) ? "1" : PSY.get_name(zone),
         "bus_i" => number,
-        "bus_type" => pm_bustypes[PSY.get_bustype(bus)],
+        "bus_type" => PM_BUSTYPES[PSY.get_bustype(bus)],
         "vmax" => PSY.get_voltage_limits(bus).max,
         "area" => 1,
         "vmin" => PSY.get_voltage_limits(bus).min,

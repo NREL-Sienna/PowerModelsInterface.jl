@@ -28,8 +28,6 @@ function get_components_to_pm(
     return PM_devices
 end
 
-const ACCEPTED_PM_DATA_KWARGS = [:name, :start_time, :time_periods, :period]
-
 """
 Creates a PowerModels data dictionary from a PowerSystems `System`. To populate time series
 data in the resulting dataset, pass `start_time` kwarg along with either `period` for a
@@ -127,7 +125,7 @@ function apply_time_series(
 
     pm_map = get_pm_map(sys)
 
-    for key in ["load", "gen"] #TODO: add shunt
+    for key in ["load", "gen", "shunt"]
         for (id, device) in pm_map[key]
             get_time_series_to_pm!(pm_data, key, id, device, start_time, time_periods)
         end
@@ -152,7 +150,7 @@ function apply_time_period!(
 )
     pm_map = get_pm_map(sys)
 
-    for key in ["load", "gen"] #TODO: add shunt
+    for key in ["load", "gen", "shunt"]
         for (id, device) in pm_map[key]
             get_time_series_to_pm!(pm_data, key, id, device, start_time, time_period)
         end

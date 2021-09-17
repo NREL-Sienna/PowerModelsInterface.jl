@@ -81,6 +81,7 @@ const PSY = PowerSystems
 const IS = PSY.IS
 const PM = PowerModels
 
+include("definitions.jl")
 include("pm_data_translator.jl")
 include("devices/bus.jl")
 include("devices/branch.jl")
