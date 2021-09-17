@@ -47,7 +47,7 @@ deploydocs(
     repo = "github.com/NREL-SIIP/PowerModelsInterface.jl.git",
     target = "build",
     branch = "gh-pages",
-    devbranch = "cb/pm_translator",
+    devbranch = "main",
     devurl = "dev",
     versions = ["stable" => "v^", "v#.#"],
     push_preview = true,
