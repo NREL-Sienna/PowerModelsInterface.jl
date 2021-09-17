@@ -3,9 +3,9 @@
 using PowerSystemCaseBuilder # data library
 sys = build_system(PSITestSystems, &quot;c_sys5&quot;) # example dataset
 
-pm_data = get_pm_data(sys)</code></pre><ol><li>Apply time series from a <a href="https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/">PowerSystems.jl <code>System</code></a> to populate a <a href="https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/">PowerModels.jl <code>Dict</code></a> or a <a href="https://lanl-ansi.github.io/PowerModels.jl/stable/multi-networks/">multi-network <code>Dict</code></a></li></ol><pre><code class="language-julia">pm_data = get_pm_data(sys, start_time = get_forecast_initial_times(sys)[2], period = 4) #applies data from the 4th period of the 2nd forecast to pm_data
+pm_data = get_pm_data(sys)</code></pre><ol><li>Apply time series from a <a href="https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/">PowerSystems.jl <code>System</code></a> to populate a <a href="https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/">PowerModels.jl <code>Dict</code></a> or a <a href="https://lanl-ansi.github.io/PowerModels.jl/stable/multi-networks/">multi-network <code>Dict</code></a></li></ol><pre><code class="language-julia">pm_data = get_pm_data(sys, start_time = DateTime(&quot;2024-01-02T00:00:00&quot;), period = 4) #applies data from the 4th period of the 2nd forecast to pm_data
 
-mn_data = get_pm_data(sys, start_time = get_forecast_initial_times(sys)[2], time_periods = 1:4) #applies data from the 4th period of the 2nd forecast to pm_data</code></pre><ol><li>Build and solve models with PowerModels using data from PowerSystems</li></ol><pre><code class="language-julia">using Ipopt
+mn_data = get_pm_data(sys, start_time = DateTime(&quot;2024-01-02T00:00:00&quot;), time_periods = 1:4) #applies data from the 4th period of the 2nd forecast to pm_data</code></pre><ol><li>Build and solve models with PowerModels using data from PowerSystems</li></ol><pre><code class="language-julia">using Ipopt
 
 run_ac_opf(sys, Ipopt.Optimizer)
 
@@ -13,7 +13,7 @@ run_opf(
     sys,
     ACPPowerModel,
     Ipopt.Optimizer,
-    start_time = get_forecast_initial_times(sys)[2],
+    start_time = DateTime(&quot;2024-01-02T00:00:00&quot;),
     period = 4,
 )
 
@@ -21,6 +21,6 @@ run_mn_opf(
     sys,
     ACPPowerModel,
     Ipopt.Optimizer,
-    start_time = get_forecast_initial_times(sys)[2],
-    time_periods = 1:get_forecast_horizon(sys),
-)</code></pre><hr/><p>PowerModelsInterface has been developed as part of the <a href="https://www.nrel.gov/analysis/siip.html">Scalable Integrated Infrastructure Planning (SIIP) initiative</a> at the U.S. Department of Energy&#39;s National Renewable Energy Laboratory (<a href="https://www.nrel.gov/">NREL</a>)</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="PowerModelsInterface/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 17 September 2021 22:03">Friday 17 September 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+    start_time = DateTime(&quot;2024-01-02T00:00:00&quot;),
+    time_periods = 1:24,
+)</code></pre><hr/><p>PowerModelsInterface has been developed as part of the <a href="https://www.nrel.gov/analysis/siip.html">Scalable Integrated Infrastructure Planning (SIIP) initiative</a> at the U.S. Department of Energy&#39;s National Renewable Energy Laboratory (<a href="https://www.nrel.gov/">NREL</a>)</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="PowerModelsInterface/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 17 September 2021 22:08">Friday 17 September 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
