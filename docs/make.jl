@@ -12,8 +12,8 @@ pages = OrderedDict("Welcome Page" => "index.md", "API" => "PowerModelsInterface
 # section name should be the name of the file for instance network_matrices.jl -> Network Matrices
 # This code is generic to all SIIP documentation
 julia_file_filter = x -> occursin(".jl", x)
-folders =
-    Dict("Developer Guide" => filter(julia_file_filter, readdir("docs/src/dev_guide")))
+folders = Dict()
+    #Dict("Developer Guide" => filter(julia_file_filter, readdir("docs/src/dev_guide")))
 
 for (section, folder) in folders
     for file in folder
@@ -37,7 +37,7 @@ for (section, folder) in folders
 end
 
 makedocs(
-    modules = [InfrastructureSystems],
+    modules = [PowerModelsInterface],
     format = Documenter.HTML(prettyurls = haskey(ENV, "GITHUB_ACTIONS")),
     sitename = "PowerModelsInterface.jl",
     pages = Any[p for p in pages],
