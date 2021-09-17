@@ -11,7 +11,7 @@ function get_component_to_pm(ix::Int, storage::S) where {S <: PSY.Storage}
         "energy_rating" => PSY.get_state_of_charge_limits(storage).max,
         "thermal_rating" => PSY.get_rating(storage),
         "status" => PSY.get_available(storage),
-        "source_id" => Any["storage", ix],
+        "source_id" => Any[PSY.get_name(storage), ix],
         "discharge_rating" => PSY.get_output_active_power_limits(storage).max,
         "storage_bus" => PSY.get_number(PSY.get_bus(storage)),
         "name" => PSY.get_name(storage),
