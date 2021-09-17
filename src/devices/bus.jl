@@ -37,7 +37,7 @@ function get_components_to_pm(sys::PSY.System, ::Type{PSY.Bus})
     return PM_buses
 end
 
-function get_pm_map(sys::PSY.System, ::Type{T}) where {T <: PSY.Bus}
+function get_pm_map(sys::PSY.System, ::Type{PSY.Bus})
     buses = PSY.get_components(PSY.Bus, sys)
     pm_map = Dict{String, PSY.Bus}()
 
