@@ -13,7 +13,7 @@ pages = OrderedDict("Welcome Page" => "index.md", "API" => "PowerModelsInterface
 # This code is generic to all SIIP documentation
 julia_file_filter = x -> occursin(".jl", x)
 folders = Dict()
-    #Dict("Developer Guide" => filter(julia_file_filter, readdir("docs/src/dev_guide")))
+#Dict("Developer Guide" => filter(julia_file_filter, readdir("docs/src/dev_guide")))
 
 for (section, folder) in folders
     for file in folder
