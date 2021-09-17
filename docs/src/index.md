@@ -23,7 +23,7 @@ package manager with
 For the current development version, "checkout" this package with
 
 ```Julia
-] add PowerModelsInterface#master
+] add PowerModelsInterface#main
 ```
 
 ### Usage

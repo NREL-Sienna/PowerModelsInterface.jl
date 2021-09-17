@@ -1,6 +1,6 @@
 # PowerModelsInterface.jl
 
-[![codecov](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl)
+[![codecov](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl)
 
 PowerModelsInterface.jl is a Julia package for accessing routines from [PowerModels.jl](https://github.com/lanl-ansi/PowerModels.jl) with data contained in [PowerSystems.jl](https://github.com/nrel-siip/PowerSystems.jl).
 
