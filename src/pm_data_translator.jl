@@ -12,12 +12,9 @@ function get_pm_map(sys::PSY.System)
     return pm_map
 end
 
-function get_pm_map(sys::PSY.System, component_type::Type{T}) where {T <: PSY.Component}
-    devices = PSY.get_components(component_type, sys)
-    PM_devices = Dict{String, component_type}()
-    for (ix, device) in enumerate(devices)
-        PM_devices["$(ix)"] = device
-    end
+function get_pm_map(sys::PSY.System, ::Type{T}) where {T <: PSY.Component}
+    return Dict(string(ix) => d for d in PSY.get_components(T, sys))
+end
 
     return PM_devices
 end
