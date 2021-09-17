@@ -13,10 +13,7 @@ function get_pm_map(sys::PSY.System)
 end
 
 function get_pm_map(sys::PSY.System, ::Type{T}) where {T <: PSY.Component}
-    return Dict(string(ix) => d for d in PSY.get_components(T, sys))
-end
-
-    return PM_devices
+    return Dict(string(ix) => d for (ix, d) in enumerate(PSY.get_components(T, sys)))
 end
 
 function get_components_to_pm(
