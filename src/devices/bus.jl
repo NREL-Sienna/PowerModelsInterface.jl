@@ -30,5 +30,5 @@ function get_components_to_pm(sys::PSY.System, ::Type{PSY.Bus})
 end
 
 function get_pm_map(sys::PSY.System, ::Type{PSY.Bus})
-     return Dict(string(PSY.get_number(b)) => b for b in PSY.get_components(PSY.Bus, sys))
+    return Dict(string(PSY.get_number(b)) => b for b in PSY.get_components(PSY.Bus, sys))
 end

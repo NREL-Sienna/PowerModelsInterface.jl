@@ -1,13 +1,13 @@
 
 function get_pm_map(sys::PSY.System)
     pm_map = Dict(
-    "branch" => get_pm_map(sys, PSY.ACBranch),
-    "dcline" => get_pm_map(sys, PSY.DCBranch),
-    "bus" => get_pm_map(sys, PSY.Bus),
-    "shunt" => get_pm_map(sys, PSY.FixedAdmittance),
-    "load" => get_pm_map(sys, PSY.StaticLoad),
-    "gen" => get_pm_map(sys, PSY.Generator),
-    "storage" => get_pm_map(sys, PSY.Storage),
+        "branch" => get_pm_map(sys, PSY.ACBranch),
+        "dcline" => get_pm_map(sys, PSY.DCBranch),
+        "bus" => get_pm_map(sys, PSY.Bus),
+        "shunt" => get_pm_map(sys, PSY.FixedAdmittance),
+        "load" => get_pm_map(sys, PSY.StaticLoad),
+        "gen" => get_pm_map(sys, PSY.Generator),
+        "storage" => get_pm_map(sys, PSY.Storage),
     )
     return pm_map
 end

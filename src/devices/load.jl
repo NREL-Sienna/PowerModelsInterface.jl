@@ -86,7 +86,6 @@ function get_time_series_to_pm!(
     PM.update_data!(pm_data, pm_update)
 end
 
-
 function get_time_series_to_pm!(
     pm_data::Dict{String, Any},
     pm_category::String,
