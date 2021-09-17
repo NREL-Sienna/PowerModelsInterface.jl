@@ -1,22 +1,20 @@
 
 function get_pm_map(sys::PSY.System)
-    pm_map = Dict{String, Any}()
-    pm_map["branch"] = get_pm_map(sys, PSY.ACBranch)
-    pm_map["dcline"] = get_pm_map(sys, PSY.DCBranch)
-    pm_map["bus"] = get_pm_map(sys, PSY.Bus)
-    pm_map["shunt"] = get_pm_map(sys, PSY.FixedAdmittance)
-    pm_map["load"] = get_pm_map(sys, PSY.StaticLoad)
-    pm_map["gen"] = get_pm_map(sys, PSY.Generator)
-    pm_map["storage"] = get_pm_map(sys, PSY.Storage)
+    pm_map = Dict(
+    "branch" => get_pm_map(sys, PSY.ACBranch),
+    "dcline" => get_pm_map(sys, PSY.DCBranch),
+    "bus" => get_pm_map(sys, PSY.Bus),
+    "shunt" => get_pm_map(sys, PSY.FixedAdmittance),
+    "load" => get_pm_map(sys, PSY.StaticLoad),
+    "gen" => get_pm_map(sys, PSY.Generator),
+    "storage" => get_pm_map(sys, PSY.Storage),
+    )
     return pm_map
 end
 
-function get_pm_map(sys::PSY.System, component_type::Type{T}) where {T <: PSY.Component}
-    devices = PSY.get_components(component_type, sys)
-    PM_devices = Dict{String, component_type}()
-    for (ix, device) in enumerate(devices)
-        PM_devices["$(ix)"] = device
-    end
+function get_pm_map(sys::PSY.System, ::Type{T}) where {T <: PSY.Component}
+    return Dict(string(ix) => d for d in PSY.get_components(T, sys))
+end
 
     return PM_devices
 end
@@ -103,7 +101,7 @@ function get_time_series_to_pm!(
     pm_data::Dict{String, Any},
     pm_category::String,
     pm_id::String,
-    device::T,
+    component::T,
     start_time::Dates.DateTime,
     time_periods::Union{UnitRange{Int}, Int},
 ) where {T <: PSY.Component}
