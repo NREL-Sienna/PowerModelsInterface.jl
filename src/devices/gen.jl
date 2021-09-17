@@ -99,10 +99,7 @@ function get_component_to_pm(ix::Int, gen::T) where {T <: PSY.ThermalGen}
         Dict{String, Any}(
             "pmin" => PSY.get_active_power_limits(gen).min,
             "fuel" => string(PSY.get_fuel(gen)),
-            "ramp_q" => ramp,
-            "ramp_agc" => ramp,
             "ramp_10" => ramp,
-            "ramp_30" => ramp,
             "qmin" => PSY.get_reactive_power_limits(gen).min,
             "gen_status" => Int(PSY.get_status(gen)),
         ),
@@ -134,10 +131,7 @@ function get_component_to_pm(ix::Int, gen::T) where {T <: PSY.HydroGen}
         PM_gen,
         Dict{String, Any}(
             "pmin" => PSY.get_active_power_limits(gen).min,
-            "ramp_q" => ramp,
-            "ramp_agc" => ramp,
             "ramp_10" => ramp,
-            "ramp_30" => ramp,
             "qmin" => PSY.get_reactive_power_limits(gen).min,
         ),
     )

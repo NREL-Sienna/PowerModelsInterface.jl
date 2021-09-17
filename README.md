@@ -4,6 +4,8 @@
 
 PowerModelsInterface.jl is a Julia package for accessing routines from [PowerModels.jl](https://github.com/lanl-ansi/PowerModels.jl) with data contained in [PowerSystems.jl](https://github.com/nrel-siip/PowerSystems.jl).
 
+This package is under development and is a work in progress. Current features will remain supported, and if new
+features are particularly useful, please open an issue. As always, PRs are welcome.
 ## Installation
 
 ```julia
