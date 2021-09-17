@@ -33,11 +33,11 @@ function get_components_to_pm(
     return PM_devices
 end
 
-const ACCEPTED_PM_DATA_KWARGS = [:name, :initial_time, :time_periods, :period]
+const ACCEPTED_PM_DATA_KWARGS = [:name, :start_time, :time_periods, :period]
 
 """
 Creates a PowerModels data dictionary from a PowerSystems `System`. To populate time series
-data in the resulting dataset, pass `initial_time` kwarg along with either `period` for a
+data in the resulting dataset, pass `start_time` kwarg along with either `period` for a
 single time period, or `time_periods` to create a multi-network dataset with multiple time periods
 
 # Arguments
@@ -45,7 +45,7 @@ single time period, or `time_periods` to create a multi-network dataset with mul
 
 # Key word arguments
 - `name::String`: system name
-- `initial_time::DateTime`: `System` forecast initial time
+- `start_time::DateTime`: `System` forecast initial time
 - `time_periods::UnitRange{Int}=1:PSY.get_forecast_horizon(sys)`: indices for selecting forecast periods. Valid extent is `1:horizon`
 - `period::Int=1`: index for selecting forecast period. Valid options
 """
@@ -78,21 +78,21 @@ function get_pm_data(sys::PSY.System; kwargs...)
         "source_version" => PSY.DATA_FORMAT_VERSION,
     )
 
-    initial_time = get(kwargs, :initial_time, nothing)
-    if !isnothing(initial_time)
+    start_time = get(kwargs, :start_time, nothing)
+    if !isnothing(start_time)
         if haskey(kwargs, :time_periods)
             time_periods = get(kwargs, :time_periods, 1:PSY.get_forecast_horizon(sys))
-            @info "applying the $time_periods periods from the $initial_time forecast"
+            @info "applying the $time_periods periods from the $start_time forecast"
             pm_data_translation = apply_time_series(
                 pm_data_translation,
                 sys,
-                kwargs[:initial_time],
+                kwargs[:start_time],
                 time_periods,
             )
         else
             period = get(kwargs, :period, 1)
-            @info "applying the $period period from the $initial_time forecast"
-            apply_time_period!(pm_data_translation, sys, kwargs[:initial_time], period)
+            @info "applying the $period period from the $start_time forecast"
+            apply_time_period!(pm_data_translation, sys, kwargs[:start_time], period)
         end
     end
 
@@ -104,7 +104,7 @@ function get_time_series_to_pm!(
     pm_category::String,
     pm_id::String,
     device::T,
-    initial_time::Dates.DateTime,
+    start_time::Dates.DateTime,
     time_periods::Union{UnitRange{Int}, Int},
 ) where {T <: PSY.Component}
     return # do nothing by default
@@ -116,13 +116,13 @@ Applies time series data from a PowerSystems `System` to a PowerModels data dict
 # Arguments
 - `pm_data::Dict{String, Any}`: PowerModels dictionary data
 - `sys::System`: PowerSystems System
-- `initial_time::Dates.DateTime`: initial time of `Forecast`
+- `start_time::Dates.DateTime`: initial time of `Forecast`
 - `time_periods::UnitRange{Int}`: time period indices of `Forecast`
 """
 function apply_time_series(
     pm_data::Dict{String, Any},
     sys::PSY.System,
-    initial_time::Dates.DateTime,
+    start_time::Dates.DateTime,
     time_periods::UnitRange{Int},
 )
     pm_data =
@@ -134,7 +134,7 @@ function apply_time_series(
 
     for key in ["load", "gen"] #TODO: add shunt
         for (id, device) in pm_map[key]
-            get_time_series_to_pm!(pm_data, key, id, device, initial_time, time_periods)
+            get_time_series_to_pm!(pm_data, key, id, device, start_time, time_periods)
         end
     end
     return pm_data
@@ -146,20 +146,20 @@ Applies a single time period of time series data from a PowerSystems `System` to
 # Arguments
 - `pm_data::Dict{String, Any}`: PowerModels dictionary data
 - `sys::System`: PowerSystems System
-- `initial_time::Dates.DateTime`: initial time of `Forecast`
+- `start_time::Dates.DateTime`: initial time of `Forecast`
 - `time_period::Int`: time period index of `Forecast`
 """
 function apply_time_period!(
     pm_data::Dict{String, Any},
     sys::PSY.System,
-    initial_time::Dates.DateTime,
+    start_time::Dates.DateTime,
     time_period::Int,
 )
     pm_map = get_pm_map(sys)
 
     for key in ["load", "gen"] #TODO: add shunt
         for (id, device) in pm_map[key]
-            get_time_series_to_pm!(pm_data, key, id, device, initial_time, time_period)
+            get_time_series_to_pm!(pm_data, key, id, device, start_time, time_period)
         end
     end
     return pm_data

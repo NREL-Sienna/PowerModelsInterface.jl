@@ -11,7 +11,7 @@
 
     pmi_mn_data = PMI.get_pm_data(
         sys,
-        initial_time = last(PSY.get_forecast_initial_times(sys)),
+        start_time = last(PSY.get_forecast_initial_times(sys)),
         time_periods = 3:5,
     )
 
@@ -19,7 +19,7 @@
 
     tp_data = PMI.get_pm_data(
         sys,
-        initial_time = first(PSY.get_forecast_initial_times(sys)),
+        start_time = first(PSY.get_forecast_initial_times(sys)),
         period = 5,
     )
 

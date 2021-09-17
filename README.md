@@ -28,9 +28,9 @@ pm_data = get_pm_data(sys)
 2. Apply time series from a [PowerSystems.jl `System`](https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/) to populate a [PowerModels.jl `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/) or a [multi-network `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/multi-networks/)
 
 ```julia
-pm_data = get_pm_data(sys, initial_time = get_forecast_initial_times(sys)[2], period = 4) #applies data from the 4th period of the 2nd forecast to pm_data
+pm_data = get_pm_data(sys, start_time = get_forecast_initial_times(sys)[2], period = 4) #applies data from the 4th period of the 2nd forecast to pm_data
 
-mn_data = get_pm_data(sys, initial_time = get_forecast_initial_times(sys)[2], time_periods = 1:4) #applies data from the 4th period of the 2nd forecast to pm_data
+mn_data = get_pm_data(sys, start_time = get_forecast_initial_times(sys)[2], time_periods = 1:4) #applies data from the 4th period of the 2nd forecast to pm_data
 ```
 
 3. Build and solve models with PowerModels using data from PowerSystems
@@ -44,7 +44,7 @@ run_opf(
     sys,
     ACPPowerModel,
     Ipopt.Optimizer,
-    initial_time = get_forecast_initial_times(sys)[2],
+    start_time = get_forecast_initial_times(sys)[2],
     period = 4,
 )
 
@@ -52,7 +52,7 @@ run_mn_opf(
     sys,
     ACPPowerModel,
     Ipopt.Optimizer,
-    initial_time = get_forecast_initial_times(sys)[2],
+    start_time = get_forecast_initial_times(sys)[2],
     time_periods = 1:get_forecast_horizon(sys),
 )
 ```
