@@ -1,8 +1,9 @@
 # PowerModelsInterface.jl
 
+[![Main - CI](https://github.com/NREL-SIIP/PowerModelsInterface.jl/actions/workflows/master-tests.yml/badge.svg)](https://github.com/NREL-SIIP/PowerModelsInterface.jl/actions/workflows/master-tests.yml)
 [![codecov](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl)
 [![Documentation](https://github.com/NREL-SIIP/PowerModelsInterface.jl/workflows/Documentation/badge.svg)](https://nrel-siip.github.io/PowerModelsInterface.jl/latest)
-
+[<img src="https://img.shields.io/badge/slack-@SIIP/PMI-blue.svg?logo=slack">](https://join.slack.com/t/nrel-siip/shared_invite/zt-glam9vdu-o8A9TwZTZqqNTKHa7q3BpQ)
 PowerModelsInterface.jl is a Julia package for accessing routines from [PowerModels.jl](https://github.com/lanl-ansi/PowerModels.jl) with data contained in [PowerSystems.jl](https://github.com/nrel-siip/PowerSystems.jl).
 
 **This package is under development and is a work in progress.** The 0.1.0 tag is being used in the development of PowerSimulations.jl and it is subject to change. Current features will remain supported, and if new features are particularly useful, please open an issue. As always, PRs are welcome.
