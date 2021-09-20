@@ -5,20 +5,20 @@
 
 PowerModelsInterface.jl is a Julia package for accessing routines from [PowerModels.jl](https://github.com/lanl-ansi/PowerModels.jl) with data contained in [PowerSystems.jl](https://github.com/nrel-siip/PowerSystems.jl).
 
-This package is under development and is a work in progress. Current features will remain supported, and if new
-features are particularly useful, please open an issue. As always, PRs are welcome.
+**This package is under development and is a work in progress.** The 0.1.0 tag is being used in the development of PowerSimulations.jl and it is subject to change. Current features will remain supported, and if new features are particularly useful, please open an issue. As always, PRs are welcome.
+
 ## Installation
 
 ```julia
 julia> ]
-(v1.6) pkg> add https://github.com/nrel-siip/PowerModelsInterfaces.jl
+(v1.6) pkg> add PowerModelsInterface
 ```
 
 ## Usage
 
 `PowerModelsInterface.jl` allows users to translate [PowerSystems.jl](https://github.com/NREL-SIIP/PowerSystems.jl) data into `PowerModels.jl` format and provides interfaces to key `PowerModels.jl` modeling functions. In particular, `PowerModelsInterface.jl` has three main capabilities:
 
-1. Translate a [PowerSystems.jl `System`](https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/) into a [PowerModels.jl `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/)
+1. Translate a [PowerSystems.jl `System`](https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/) into a [PowerModels.jl data model `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/)
 
 ```julia
 using PowerSystems, PowerModelsInterface, Dates
@@ -62,9 +62,9 @@ run_mn_opf(
 
 ## Development
 
-Contributions to the development and enahancement of PowerSimulations is welcome. Please see [CONTRIBUTING.md](https://github.com/NREL-SIIP/PowerSimulations.jl/blob/master/CONTRIBUTING.md) for code contribution guidelines.
+Contributions to the development and enahancement of PowerSimulations is welcome. Please see [CONTRIBUTING.md](https://github.com/NREL-SIIP/PowermodelsInterface.jl/blob/master/CONTRIBUTING.md) for code contribution guidelines.
 
 ## License
 
-PowerSimulations is released under a BSD [license](https://github.com/NREL/PowerSimulations.jl/blob/master/LICENSE). PowerSimulations has been developed as part of the Scalable Integrated Infrastructure Planning (SIIP)
+PowerSimulations is released under a BSD [license](https://github.com/NREL/PowermodelsInterface.jl/blob/master/LICENSE). PowerSimulations has been developed as part of the Scalable Integrated Infrastructure Planning (SIIP)
 initiative at the U.S. Department of Energy's National Renewable Energy Laboratory ([NREL](https://www.nrel.gov/))
