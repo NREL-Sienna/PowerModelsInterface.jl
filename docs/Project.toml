@@ -1,0 +1,9 @@
+[deps]
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+PowerModelsInterface = "7a4b9400-1441-4f08-9626-3f96e0a9a29b"
+
+[compat]
+Documenter = "0.25"
+julia = "^1.2"
