@@ -34,11 +34,10 @@ function get_time_series_to_pm!(
     pm_field_name = "pd" # change this line to apply forecast to different fields
 
     ts_data = PSY.get_time_series_values(
-        PSY.Deterministic,
+        PSY.AbstractDeterministic,
         device,
         psy_forecast_name,
         start_time = start_time,
-        len = last(time_periods),
     )
     if haskey(pm_data, "nw")
         pm_update = Dict{String, Any}("nw" => Dict{String, Any}())
@@ -69,11 +68,10 @@ function get_time_series_to_pm!(
     pm_field_name = "pd" # change this line to apply forecast to different fields
 
     ts_data = PSY.get_time_series_values(
-        PSY.Deterministic,
+        PSY.AbstractDeterministic,
         device,
         psy_forecast_name,
         start_time = start_time,
-        len = time_period,
     )
     if haskey(pm_data, "nw")
         throw(@error "cannot apply single time period data to multi-network")
@@ -98,11 +96,10 @@ function get_time_series_to_pm!(
     pm_field_name = "qd" # change this line to apply forecast to different fields
 
     ts_data = PSY.get_time_series_values(
-        PSY.Deterministic,
+        PSY.AbstractDeterministic,
         device,
         psy_forecast_name,
         start_time = start_time,
-        len = last(time_periods),
     )
     if haskey(pm_data, "nw")
         pm_update = Dict{String, Any}("nw" => Dict{String, Any}())
@@ -133,11 +130,10 @@ function get_time_series_to_pm!(
     pm_field_name = "qd" # change this line to apply forecast to different fields
 
     ts_data = PSY.get_time_series_values(
-        PSY.Deterministic,
+        PSY.AbstractDeterministic,
         device,
         psy_forecast_name,
         start_time = start_time,
-        len = time_period,
     )
     if haskey(pm_data, "nw")
         throw(@error "cannot apply single time period data to multi-network")

@@ -1,8 +1,8 @@
 # PowerModelsInterface.jl
 
 [![Main - CI](https://github.com/NREL-SIIP/PowerModelsInterface.jl/actions/workflows/master-tests.yml/badge.svg)](https://github.com/NREL-SIIP/PowerModelsInterface.jl/actions/workflows/master-tests.yml)
-[![codecov](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/nrel-siip/PowerModelsInterface.jl)
-[![Documentation](https://github.com/NREL-SIIP/PowerModelsInterface.jl/workflows/Documentation/badge.svg)](https://nrel-siip.github.io/PowerModelsInterface.jl/latest)
+[![codecov](https://codecov.io/gh/NREL-SIIP/PowerModelsInterface.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/NREL-SIIP/PowerModelsInterface.jl)
+[![Documentation](https://github.com/NREL-SIIP/PowerModelsInterface.jl/workflows/Documentation/badge.svg)](https://nrel-siip.github.io/PowerModelsInterface.jl/stable)
 [<img src="https://img.shields.io/badge/slack-@SIIP/PMI-blue.svg?logo=slack">](https://join.slack.com/t/nrel-siip/shared_invite/zt-glam9vdu-o8A9TwZTZqqNTKHa7q3BpQ)
 
 PowerModelsInterface.jl is a Julia package for accessing routines from [PowerModels.jl](https://github.com/lanl-ansi/PowerModels.jl) with data contained in [PowerSystems.jl](https://github.com/nrel-siip/PowerSystems.jl).
@@ -20,7 +20,7 @@ julia> ]
 
 `PowerModelsInterface.jl` allows users to translate [PowerSystems.jl](https://github.com/NREL-SIIP/PowerSystems.jl) data into `PowerModels.jl` format and provides interfaces to key `PowerModels.jl` modeling functions. In particular, `PowerModelsInterface.jl` has three main capabilities:
 
-1. Translate a [PowerSystems.jl `System`](https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/) into a [PowerModels.jl data model `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/)
+### Translate a [PowerSystems.jl `System`](https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/) into a [PowerModels.jl data model `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/)
 
 ```julia
 using PowerSystems, PowerModelsInterface, Dates
@@ -30,7 +30,7 @@ sys = build_system(PSITestSystems, "c_sys5") # example dataset
 pm_data = get_pm_data(sys)
 ```
 
-2. Apply time series from a [PowerSystems.jl `System`](https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/) to populate a [PowerModels.jl `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/) or a [multi-network `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/multi-networks/)
+### Apply time series from a [PowerSystems.jl `System`](https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/) to populate a [PowerModels.jl `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/) or a [multi-network `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/multi-networks/)
 
 ```julia
 pm_data = get_pm_data(sys, start_time = DateTime("2024-01-02T00:00:00"), period = 4) #applies data from the 4th period of the 2nd forecast to pm_data
@@ -38,7 +38,7 @@ pm_data = get_pm_data(sys, start_time = DateTime("2024-01-02T00:00:00"), period 
 mn_data = get_pm_data(sys, start_time = DateTime("2024-01-02T00:00:00"), time_periods = 1:4) #applies data from the 4th period of the 2nd forecast to pm_data
 ```
 
-3. Build and solve models with PowerModels using data from PowerSystems
+### Build and solve models with PowerModels using data from PowerSystems
 
 ```julia
 using Ipopt
