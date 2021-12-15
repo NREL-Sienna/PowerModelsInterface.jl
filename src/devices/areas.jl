@@ -13,7 +13,9 @@ function get_components_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Area}
             # get largest gen bus
             pv_buses = [b for b in buses if PSY.get_bustype(b) == PSY.BusTypes.PV]
             gens = PSY.get_components(PSY.Generator, sys, x -> PSY.get_bus(x) ∈ pv_buses)
-            ref_bus = last(sort(collect(gens), by = x -> PSY.get_max_active_power(x)))
+            ref_bus = PSY.get_bus(
+                last(sort(collect(gens), by = x -> PSY.get_max_active_power(x))),
+            )
         else
             ref_bus = buses[1]
         end
@@ -21,7 +23,7 @@ function get_components_to_pm(sys::PSY.System, ::Type{T}) where {T <: PSY.Area}
         PM_areas["$(ix)"] = Dict{String, Any}(
             "source_id" => ["areas", ix],
             "col_1" => ix,
-            "col_2" => ref_bus,
+            "col_2" => PSY.get_number(ref_bus),
             "index" => ix,
         )
     end

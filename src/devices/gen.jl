@@ -114,7 +114,7 @@ function get_component_to_pm(ix::Int, gen::T) where {T <: PSY.RenewableGen}
         PM_gen,
         Dict{String, Any}("pmin" => 0.0, "qmin" => PSY.get_reactive_power_limits(gen).min),
     )
-    add_pm_cost!(PM_gen, PSY.get_operation_cost(gen))
+    add_pm_cost!(PM_gen, PSY.get_operation_cost(gen), gen.internal.units_info.base_value)
     return PM_gen
 end
 
@@ -135,7 +135,7 @@ function get_component_to_pm(ix::Int, gen::T) where {T <: PSY.HydroGen}
             "qmin" => PSY.get_reactive_power_limits(gen).min,
         ),
     )
-    add_pm_cost!(PM_gen, PSY.get_operation_cost(gen))
+    add_pm_cost!(PM_gen, PSY.get_operation_cost(gen), gen.internal.units_info.base_value)
     return PM_gen
 end
 
