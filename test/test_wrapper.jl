@@ -11,7 +11,7 @@ function parse_pm_pmi(file)
     pmi_data = PMI.get_pm_data(System(file))
     #TODO: remove the following for loop once PM#v0.20.0 is tagged
     for id in keys(pmi_data["bus"])
-        pm_data["bus"][id] = pmi_data["bus"][id]
+        pm_data["bus"][id]["vm"] = pmi_data["bus"][id]["vm"]
     end
     return pm_data, pmi_data
 end
