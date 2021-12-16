@@ -20,12 +20,6 @@ package manager with
 ] add PowerModelsInterface
 ```
 
-For the current development version, "checkout" this package with
-
-```Julia
-] add PowerModelsInterface#main
-```
-
 ### Usage
 
 `PowerModelsInterface.jl` allows users to translate [PowerSystems.jl](https://github.com/NREL-SIIP/PowerSystems.jl) data into `PowerModels.jl` format and provides interfaces to key `PowerModels.jl` modeling functions. In particular, `PowerModelsInterface.jl` has three main capabilities:
@@ -43,9 +37,9 @@ pm_data = get_pm_data(sys)
 #### Apply time series from a [PowerSystems.jl `System`](https://nrel-siip.github.io/PowerSystems.jl/stable/modeler_guide/system/) to populate a [PowerModels.jl `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/network-data/) or a [multi-network `Dict`](https://lanl-ansi.github.io/PowerModels.jl/stable/multi-networks/)
 
 ```julia
-pm_data = get_pm_data(sys, start_time = DateTime("2024-01-02T00:00:00"), period = 4) #applies data from the 4th period of the 2nd forecast to pm_data
+pm_data = get_pm_data(sys, start_time = DateTime("2024-01-02T00:00:00"), period = 4) #applies data from the 4th period of the forecast beginning on Jan 2 to pm_data
 
-mn_data = get_pm_data(sys, start_time = DateTime("2024-01-02T00:00:00"), time_periods = 1:4) #applies data from the 4th period of the 2nd forecast to pm_data
+mn_data = get_pm_data(sys, start_time = DateTime("2024-01-02T00:00:00"), time_periods = 1:4) #applies data from the first four periods of the forecast beginning on Jan 2 to pm_data
 ```
 
 #### Build and solve models with PowerModels using data from PowerSystems
