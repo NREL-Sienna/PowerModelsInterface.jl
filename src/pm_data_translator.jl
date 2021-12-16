@@ -103,6 +103,14 @@ function get_time_series_to_pm!(
     return # do nothing by default
 end
 
+function check_forecasts(sys::PSY.System)
+    if PSY.get_time_series_counts(sys) == (0, 0, 0)
+        throw(error("System has no time series: cannot create multinetwork"))
+    elseif isempty(PSY.get_forecast_initial_times(sys))
+        throw(error("System has no Forecast data: run `PowerSystems.transform_single_time_series!`"))
+    end
+end
+
 """
 Applies time series data from a PowerSystems `System` to a PowerModels data dictionary.
 
@@ -118,6 +126,7 @@ function apply_time_series(
     start_time::Dates.DateTime,
     time_periods::UnitRange{Int},
 )
+    check_forecasts(sys)
     pm_data =
         PM._IM.ismultinetwork(pm_data) ? pm_data :
         PM.replicate(pm_data, length(time_periods))
@@ -148,6 +157,7 @@ function apply_time_period!(
     start_time::Dates.DateTime,
     time_period::Int,
 )
+    check_forecasts(sys)
     pm_map = get_pm_map(sys)
 
     for key in ["load", "gen", "shunt"]
