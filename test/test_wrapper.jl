@@ -16,7 +16,6 @@ function parse_pm_pmi(file)
     return pm_data, pmi_data
 end
 
-
 @testset "Test Power Flow" begin
     file = joinpath(PM_DATA_DIR, "matpower", "case5.m")
     for (model, solver) in MODEL_SOLVER_MAP
