@@ -6,6 +6,17 @@ function bus_gen_values(data, solution, value_key)
     return bus_pg
 end
 
+function parse_pm_pmi(file)
+    pm_data = PowerModels.parse_file(file)
+    pmi_data = PMI.get_pm_data(System(file))
+    #TODO: remove the following for loop once PM#v0.20.0 is tagged
+    for id in keys(pmi_data["bus"])
+        pm_data["bus"][id] = pmi_data["bus"][id]
+    end
+    return pm_data, pmi_data
+end
+
+
 @testset "Test Power Flow" begin
     file = joinpath(PM_DATA_DIR, "matpower", "case5.m")
     for (model, solver) in MODEL_SOLVER_MAP
@@ -35,7 +46,7 @@ end
 
 @testset "Test DC PowerFlow" begin
     file = joinpath(PM_DATA_DIR, "matpower", "case5.m")
-    data = PowerModels.parse_file(file)
+    data, pmi_data = parse_pm_pmi(file)
     pm_native = compute_dc_pf(data)
     pm_opt = run_dc_pf(data, ipopt_solver)
     ps_native = compute_dc_pf(System(file))
@@ -59,10 +70,11 @@ end
 
 @testset "5-bus case" begin
     file = joinpath(PM_DATA_DIR, "matpower", "case5.m")
-    data = PowerModels.parse_file(file)
+    data, pmi_data = parse_pm_pmi(file)
+
     pm_native = compute_ac_pf(data)
     pm_opt = run_ac_pf(data, ipopt_solver)
-    pmi_data = PMI.get_pm_data(System(file))
+
     ps_native = compute_ac_pf(pmi_data)
     ps_opt = run_ac_pf(pmi_data, ipopt_solver)
 

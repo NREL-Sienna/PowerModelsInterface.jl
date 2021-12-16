@@ -77,7 +77,7 @@ function pm_gen_core(gen::T, ix::Int) where {T <: PSY.Generator}
         "index" => ix,
         "name" => PSY.get_name(gen),
         "gen_bus" => PSY.get_number(PSY.get_bus(gen)),
-        "source_id" => split(PSY.get_name(gen), "-"),
+        "source_id" => convert(Vector{Any}, split(PSY.get_name(gen), "-")),
         "mbase" => PSY.get_base_power(gen),
         "gen_status" => Int(PSY.get_available(gen)),
         "pg" => PSY.get_active_power(gen),
