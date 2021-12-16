@@ -43,9 +43,10 @@ scs_solver = JuMP.optimizer_with_attributes(
     "verbose" => 0,
 )
 
-const MODEL_SOLVER_MAP =
-    Dict(ACPPowerModel => Sys.iswindows() ? ipopt_win_solver : ipopt_solver,
-    SOCWRConicPowerModel => scs_solver)
+const MODEL_SOLVER_MAP = Dict(
+    ACPPowerModel => Sys.iswindows() ? ipopt_win_solver : ipopt_solver,
+    SOCWRConicPowerModel => scs_solver,
+)
 
 const PM = PowerModels
 const PSY = PowerSystems
