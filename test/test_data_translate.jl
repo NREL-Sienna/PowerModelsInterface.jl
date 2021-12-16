@@ -132,3 +132,16 @@ end
         end
     end
 end
+
+@testset "Test RTS-GMLC tabular data" begin
+    sys = PSB.build_system(PSITestSystems, "RTS_GMLC_sys")
+    pm_data = PMI.get_pm_data(sys)
+    @test length(pm_data["bus"]) == length(PSY.get_components(PSY.Bus, sys))
+    @test length(pm_data["branch"]) == length(PSY.get_components(PSY.ACBranch, sys))
+    @test length(pm_data["gen"]) == length(PSY.get_components(PSY.Generator, sys))
+    @test length(pm_data["storage"]) == length(PSY.get_components(PSY.Storage, sys))
+    @test length(pm_data["dcline"]) == length(PSY.get_components(PSY.DCBranch, sys))
+    @test length(pm_data["areas"]) == length(PSY.get_components(PSY.Area, sys))
+    @test length(pm_data["load"]) == length(PSY.get_components(PSY.PowerLoad, sys))
+    @test length(pm_data["shunt"]) == length(PSY.get_components(PSY.FixedAdmittance, sys))
+end

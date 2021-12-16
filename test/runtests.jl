@@ -27,12 +27,11 @@ ipopt_solver = JuMP.optimizer_with_attributes(
     "print_level" => 0,
     "max_iter" => 100000,
 )
-ipopt_ws_solver = JuMP.optimizer_with_attributes(
+ipopt_win_solver = JuMP.optimizer_with_attributes(
     Ipopt.Optimizer,
     "tol" => 1e-4,
-    "mu_init" => 1e-4,
     "print_level" => 0,
-    "max_iter" => 100000,
+    "max_iter" => 1000000,
 )
 
 cbc_solver = JuMP.optimizer_with_attributes(Cbc.Optimizer, "logLevel" => 0)
@@ -44,8 +43,10 @@ scs_solver = JuMP.optimizer_with_attributes(
     "verbose" => 0,
 )
 
-const MODEL_SOLVER_MAP =
-    Dict(ACPPowerModel => ipopt_solver, SOCWRConicPowerModel => scs_solver)
+const MODEL_SOLVER_MAP = Dict(
+    ACPPowerModel => Sys.iswindows() ? ipopt_win_solver : ipopt_solver,
+    SOCWRConicPowerModel => scs_solver,
+)
 
 const PM = PowerModels
 const PSY = PowerSystems
