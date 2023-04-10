@@ -1,10 +1,39 @@
-function get_component_to_pm(ix::Int, load::PSY.StaticLoad)
+function _get_total_p(l::PSY.PowerLoad)
+    return PSY.get_active_power(l)
+end
+
+function _get_total_q(l::PSY.PowerLoad)
+    return PSY.get_reactive_power(l)
+end
+
+function _get_total_p(l::PSY.StandardLoad)
+    return PSY.get_constant_active_power(l) +
+           PSY.get_current_active_power(l) +
+           PSY.get_impedance_active_power(l)
+end
+
+function _get_total_q(l::PSY.StandardLoad)
+    return PSY.get_constant_reactive_power(l) +
+           PSY.get_current_reactive_power(l) +
+           PSY.get_impedance_reactive_power(l)
+end
+
+function _get_total_p(l::PSY.ExponentialLoad)
+    return PSY.get_active_power(l)
+end
+
+function _get_total_q(l::PSY.ExponentialLoad)
+    return PSY.get_reactive_power(l)
+end
+
+
+function get_component_to_pm(ix::Int, load::PSY.ElectricLoad)
     PM_load = Dict{String, Any}(
         "source_id" => ["bus", PSY.get_name(PSY.get_bus(load))],
         "load_bus" => PSY.get_number(PSY.get_bus(load)),
         "status" => Int(PSY.get_available(load)),
-        "qd" => PSY.get_reactive_power(load), # TODO: get Q load from time series
-        "pd" => PSY.get_active_power(load),
+        "qd" => _get_total_q(load), # TODO: get Q load from time series
+        "pd" => _get_total_p(load),
         "index" => ix,
     )
     return PM_load

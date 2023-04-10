@@ -66,7 +66,7 @@ function get_pm_data(sys::PSY.System; kwargs...)
         "shunt" => pm_shunts,
         "load" => pm_loads,
         "areas" => pm_areas,
-        "name" => get(kwargs, :name, ""), # TODO: add name to PSY.System
+        "name" => PSY.get_name(sys), # TODO: add name to PSY.System
         "source_type" => "PowerSystems.jl",
         "source_version" => PSY.DATA_FORMAT_VERSION,
     )
